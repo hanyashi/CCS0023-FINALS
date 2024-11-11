@@ -1,12 +1,12 @@
 // importz
 import java.awt.*;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 
 public class mainSushi {
     // instantiating Swing GUI shit
@@ -32,9 +32,9 @@ public class mainSushi {
     }
 
     private void swingGUI() {
-        // making the frame panel
+        // making the main frame's panel
         JPanel mainPanel = new JPanel();
-        mainPanel.setBackground(Color.decode("#CCDAD1"))
+        mainPanel.setBackground(Color.decode("#CCDAD1")); 
         tableModel = new DefaultTableModel(
                 new String[] { "Title", "Description", "Due Date", "Priority", "Status", "Category" }, 0) {
             @Override
