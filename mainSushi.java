@@ -23,7 +23,7 @@ public class mainSushi {
         mainFrame.setSize(1000, 700);
         mainFrame.getContentPane().setBackground(Color.decode("#CCDAD1"));
         mainFrame.setResizable(false);
-        ImageIcon logo = new ImageIcon("assets/sushi-logo.png");
+        ImageIcon logo = new ImageIcon(getClass().getClassLoader().getResource("assets/sushi-logo.png"));
         mainFrame.setIconImage(logo.getImage());
         swingGUI();
         mainFrame.setVisible(true);
@@ -43,7 +43,7 @@ public class mainSushi {
             }
         };
 
-        // TABLE
+            // TABLE
         // making the table that the tasks will be in
         taskTable = new JTable(tableModel);
 
@@ -66,9 +66,9 @@ public class mainSushi {
                 ((JLabel) comp).setForeground(Color.decode("#CCDAD1"));
                 if (column < table.getColumnCount() - 1) { // needed it to only paint borders on specific cells like on
                                                            // the last or first one, so that in-betweens can be generic
-                    ((JComponent) comp).setBorder(BorderFactory.createMatteBorder(0, 0, 1, 1, Color.decode("#CCDAD1")));
+                    ((JComponent) comp).setBorder(BorderFactory.createMatteBorder(0, 1, 1, 1, Color.decode("#211A1E")));
                 } else {
-                    ((JComponent) comp).setBorder(BorderFactory.createMatteBorder(0, 1, 1, 0, Color.decode("#CCDAD1")));
+                    ((JComponent) comp).setBorder(BorderFactory.createMatteBorder(0, 1, 1, 1, Color.decode("#211A1E")));
                 }
 
                 return comp;
@@ -91,34 +91,29 @@ public class mainSushi {
         taskTable.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-                    boolean hasFocus, int row, int column) {
+                                                           boolean hasFocus, int row, int column) {
                 Component comp = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-
-                // applies borders to all columns except the last one
-                if (column < table.getColumnCount() - 1) {
-                    ((JComponent) comp).setBorder(BorderFactory.createMatteBorder(0, 1, 1, 1, Color.GRAY));
+        
+                ((JLabel) comp).setHorizontalAlignment(SwingConstants.CENTER);
+        
+                ((JComponent) comp).setBorder(BorderFactory.createMatteBorder(
+                    1, 1, (row == table.getRowCount() - 1 ? 1 : 0), 1, Color.decode("#211A1E")
+                ));
+        
+                Color alternateColor = Color.decode("#B5CBBC");
+                Color defaultColor = Color.decode("#CCDAD1");
+        
+                if (!isSelected) {
+                    comp.setBackground(row % 2 == 0 ? alternateColor : defaultColor);
                 } else {
-                    ((JComponent) comp).setBorder(BorderFactory.createMatteBorder(0, 1, 1, 1, Color.GRAY));
+                    comp.setBackground(Color.decode("#35524A"));
                 }
-
-                // applies the border for the entire row at the bottom of the table
-                if (row == table.getRowCount() - 1) {
-                    ((JComponent) comp).setBorder(BorderFactory.createMatteBorder(0, 1, 1, 1, Color.GRAY));
-                }
-                Component returnComp = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row,
-                        column);
-                Color alternateColor = (Color.decode("#B5CBBC"));
-                ((JComponent) comp).setBackground(Color.decode("#CCDAD1"));
-                if (!returnComp.getBackground().equals(alternateColor)) {
-                    Color bg = (row % 2 == 0 ? alternateColor : getBackground());
-                    returnComp.setBackground(bg);
-                    bg = null;
-                }
+        
                 return comp;
             }
         });
         //
-        // END OF TABLE
+            // END OF TABLE
 
         // adds the mainPanel (which contains the table and topPanel) to the JFrame
         mainFrame.add(mainPanel, BorderLayout.CENTER);
@@ -130,7 +125,8 @@ public class mainSushi {
 
         // label for title (left-aligned with padding on the left)
         JLabel title = new JLabel("Sushi Beta 1.0 ", SwingConstants.LEFT);
-        ImageIcon logo = new ImageIcon("assets/sushi-logo2.png");
+        // ImageIcon logo = new ImageIcon("C:/Users/hanse/Desktop/CCS0023-FINALS-REPO/CCS0023-FINALS/assets/sushi-logo2.png");
+        ImageIcon logo = new ImageIcon(getClass().getClassLoader().getResource("assets/sushi-logo2.png"));
         title.setIcon(logo);
         title.setIconTextGap(10);
         title.setFont(new Font("Montserrat", Font.ITALIC, 24));
