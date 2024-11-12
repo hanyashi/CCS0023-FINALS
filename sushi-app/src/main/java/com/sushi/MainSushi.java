@@ -2,9 +2,12 @@ package com.sushi;
 
 // importz
 import java.awt.*;
+import java.util.List;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -36,7 +39,7 @@ public class MainSushi {
     private void swingGUI() {
         // making the main frame's panel
         JPanel mainPanel = new JPanel();
-        mainPanel.setBackground(Color.decode("#CCDAD1")); 
+        mainPanel.setBackground(Color.decode("#CCDAD1"));
         tableModel = new DefaultTableModel(
                 new String[] { "Title", "Description", "Due Date", "Priority", "Status", "Category" }, 0) {
             @Override
@@ -45,7 +48,7 @@ public class MainSushi {
             }
         };
 
-            // TABLE
+        // TABLE
         // making the table that the tasks will be in
         taskTable = new JTable(tableModel);
 
@@ -93,29 +96,28 @@ public class MainSushi {
         taskTable.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-                                                           boolean hasFocus, int row, int column) {
+                    boolean hasFocus, int row, int column) {
                 Component comp = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-        
+
                 ((JLabel) comp).setHorizontalAlignment(SwingConstants.CENTER);
-        
+
                 ((JComponent) comp).setBorder(BorderFactory.createMatteBorder(
-                    1, 1, (row == table.getRowCount() - 1 ? 1 : 0), 1, Color.decode("#211A1E")
-                ));
-        
+                        1, 1, (row == table.getRowCount() - 1 ? 1 : 0), 1, Color.decode("#211A1E")));
+
                 Color alternateColor = Color.decode("#B5CBBC");
                 Color defaultColor = Color.decode("#CCDAD1");
-        
+
                 if (!isSelected) {
                     comp.setBackground(row % 2 == 0 ? alternateColor : defaultColor);
                 } else {
                     comp.setBackground(Color.decode("#35524A"));
                 }
-        
+
                 return comp;
             }
         });
         //
-            // END OF TABLE
+        // END OF TABLE
 
         // adds the mainPanel (which contains the table and topPanel) to the JFrame
         mainFrame.add(mainPanel, BorderLayout.CENTER);
@@ -127,7 +129,8 @@ public class MainSushi {
 
         // label for title (left-aligned with padding on the left)
         JLabel title = new JLabel("Sushi Beta 1.0 ", SwingConstants.LEFT);
-        // ImageIcon logo = new ImageIcon("C:/Users/hanse/Desktop/CCS0023-FINALS-REPO/CCS0023-FINALS/assets/sushi-logo2.png");
+        // ImageIcon logo = new
+        // ImageIcon("C:/Users/hanse/Desktop/CCS0023-FINALS-REPO/CCS0023-FINALS/assets/sushi-logo2.png");
         ImageIcon logo = new ImageIcon(getClass().getClassLoader().getResource("assets/sushi-logo2.png"));
         title.setIcon(logo);
         title.setIconTextGap(10);
@@ -294,6 +297,19 @@ public class MainSushi {
     // refreshes every time a task has been edited, added, OR deleted
     private void refreshTaskTable() {
         tableModel.setRowCount(0);
+        List<Tasks> tasks = manager.getAllTasks();
+        Collections.sort(tasks, Comparator.comparingInt(task -> {
+            switch (task.getPriority()) {
+                case "High":
+                    return 0;
+                case "Medium":
+                    return 1;
+                case "Low":
+                    return 2;
+                default:
+                    return Integer.MAX_VALUE;
+            }
+        }));
 
         for (Tasks task : manager.getAllTasks()) {
             var localDateTime = LocalDateTime.ofInstant(task.getDueDate().toInstant(), ZoneId.systemDefault());
