@@ -1,15 +1,40 @@
 package com.sushi;
 
 // importz
-import java.awt.*;
-import java.util.List;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
-import javax.swing.*;
+import java.util.List;
+
+import javax.swing.BorderFactory;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.SpinnerDateModel;
+import javax.swing.SwingConstants;
+import javax.swing.plaf.basic.BasicComboBoxUI;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
@@ -67,7 +92,7 @@ public class MainSushi {
                 Component comp = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 
                 ((JLabel) comp).setHorizontalAlignment(SwingConstants.CENTER);
-                ((JLabel) comp).setFont(new Font("Montserrat", Font.PLAIN, 16));
+                ((JLabel) comp).setFont(new Font("Montserrat", Font.BOLD, 16));
                 ((JLabel) comp).setForeground(Color.decode("#CCDAD1"));
                 if (column < table.getColumnCount() - 1) { // needed it to only paint borders on specific cells like on
                                                            // the last or first one, so that in-betweens can be generic
@@ -99,7 +124,12 @@ public class MainSushi {
                     boolean hasFocus, int row, int column) {
                 Component comp = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 
-                ((JLabel) comp).setHorizontalAlignment(SwingConstants.CENTER);
+                if (column == 0 || column == 1 || column == 2) {
+                    ((JLabel) comp).setHorizontalAlignment(SwingConstants.LEFT);
+                } else {
+                    ((JLabel) comp).setHorizontalAlignment(SwingConstants.CENTER);
+                } // this block makes it so that only the name desc and due date are set to left and not centered
+                
 
                 ((JComponent) comp).setBorder(BorderFactory.createMatteBorder(
                         1, 1, (row == table.getRowCount() - 1 ? 1 : 0), 1, Color.decode("#211A1E")));
@@ -110,7 +140,8 @@ public class MainSushi {
                 if (!isSelected) {
                     comp.setBackground(row % 2 == 0 ? alternateColor : defaultColor);
                 } else {
-                    comp.setBackground(Color.decode("#35524A"));
+                    comp.setBackground(Color.decode("#99C567"));
+                    comp.setForeground(Color.decode("#211A1E"));
                 }
 
                 return comp;
@@ -134,7 +165,7 @@ public class MainSushi {
         ImageIcon logo = new ImageIcon(getClass().getClassLoader().getResource("assets/sushi-logo2.png"));
         title.setIcon(logo);
         title.setIconTextGap(10);
-        title.setFont(new Font("Montserrat", Font.ITALIC, 24));
+        title.setFont(new Font("Montserrat", Font.BOLD | Font.ITALIC, 24));
         title.setForeground(Color.decode("#FF8552"));
         title.setBorder(BorderFactory.createEmptyBorder(0, 30, 0, 0));
 
@@ -158,6 +189,53 @@ public class MainSushi {
 
         // adds title panel to the main frame at the top
         mainFrame.add(titlePanel, BorderLayout.NORTH);
+
+        // dropdown menu for sorting!!
+        JComboBox<String> sortBy = new JComboBox<>(new String[]{"Priority", "Name", "Due Date", "Status", "Category"});
+        
+        mainPanel.add(sortBy, BorderLayout.EAST);
+
+        sortBy.setUI(new BasicComboBoxUI() {
+            @Override
+            protected JButton createArrowButton() {
+                JButton arrowButton = super.createArrowButton();
+                arrowButton.setBackground(Color.decode("#211A1E"));
+                arrowButton.setForeground(Color.decode("#211A1E"));
+                arrowButton.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.decode("#211A1E")));
+                arrowButton.setFocusable(false);
+                return arrowButton;
+            }
+        });
+
+        sortBy.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                
+                label.setHorizontalAlignment(SwingConstants.CENTER);
+                label.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.decode("#CCDAD1")));
+                label.setOpaque(true);
+        
+                return label;   
+            }
+        });
+
+        sortBy.addActionListener(e -> {
+            String selectedOption = (String) sortBy.getSelectedItem();
+            refreshTaskTable(selectedOption);
+        });
+
+        sortBy.setPreferredSize(new Dimension(100, 25));
+        sortBy.setFont(new Font("Montserrat", Font.PLAIN, 12));
+        sortBy.setForeground(Color.decode("#211A1E"));
+        sortBy.setBackground(Color.decode("#211A1E"));
+        sortBy.setFocusable(false);
+        sortBy.setBorder(BorderFactory.createLineBorder(Color.decode("#211A1E")));
+
+        sortBy.repaint();
+
+        // end of sortby
+
 
         // ensures that the frame is updated accordingly
         mainFrame.revalidate();
@@ -294,22 +372,77 @@ public class MainSushi {
         }
     }
 
-    // refreshes every time a task has been edited, added, OR deleted
+    // overloaded method
     private void refreshTaskTable() {
+        refreshTaskTable("Priority");
+    }
+
+    // refreshes every time a task has been edited, added, OR deleted
+    private void refreshTaskTable(String sortBy) {
         tableModel.setRowCount(0);
         List<Tasks> tasks = manager.getAllTasks();
-        Collections.sort(tasks, Comparator.comparingInt(task -> {
-            switch (task.getPriority()) {
-                case "High":
-                    return 0;
-                case "Medium":
-                    return 1;
-                case "Low":
-                    return 2;
-                default:
-                    return Integer.MAX_VALUE;
-            }
-        }));
+        
+        Comparator<Tasks> comparator = null;
+
+        switch (sortBy) {
+            case "Priority":
+                comparator = Comparator.comparingInt(task -> {
+                    switch (task.getPriority()) {
+                        case "High":
+                            return 0;
+                        case "Medium":
+                            return 1;
+                        case "Low":
+                            return 2;
+                        default:
+                            return Integer.MAX_VALUE;
+                    }
+            });
+                break;
+            case "Name":
+                comparator = Comparator.comparing(Tasks::getTitle);
+                break;
+            case "Due Date":
+                comparator = Comparator.comparing(task -> task.getDueDate());
+                break;
+            case "Status":
+                comparator = Comparator.comparingInt(task -> {
+                    switch (task.getStatus()) {
+                        case "Overdue":
+                            return 0; 
+                        case "Pending":
+                            return 1;
+                        case "Completed":
+                            return 2;
+                        default:
+                            return Integer.MAX_VALUE;
+                    } // thx cess
+                });
+                break;
+            case "Category":
+                comparator = Comparator.comparing(Tasks::getCategory);
+                break;
+            default:
+            break;
+            
+        }
+
+        if (comparator != null) {
+            Collections.sort(tasks, comparator);
+        }
+
+        // Collections.sort(tasks, Comparator.comparingInt(task -> {
+        //     switch (task.getPriority()) {
+        //         case "High":
+        //             return 0;
+        //         case "Medium":
+        //             return 1;
+        //         case "Low":
+        //             return 2;
+        //         default:
+        //             return Integer.MAX_VALUE;
+        //     } // this is clever! good job!
+        // }));
 
         for (Tasks task : manager.getAllTasks()) {
             var localDateTime = LocalDateTime.ofInstant(task.getDueDate().toInstant(), ZoneId.systemDefault());

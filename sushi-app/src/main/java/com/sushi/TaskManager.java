@@ -1,13 +1,15 @@
 package com.sushi;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 
 public final class TaskManager {
     private List<Tasks> tasks;
@@ -32,7 +34,8 @@ public final class TaskManager {
 
     public void saveTasks() {
     try (Writer writer = new FileWriter("tasks.json")) {
-        Gson gson = new Gson();
+        Gson gson;
+        gson = new GsonBuilder().setPrettyPrinting().create();
         gson.toJson(tasks, writer);
     } catch (IOException e) {
         e.printStackTrace();
