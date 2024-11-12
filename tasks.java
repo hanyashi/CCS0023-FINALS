@@ -1,6 +1,6 @@
 import java.util.Date;
 
-public class tasks {
+public class Tasks {
     private String title;
     private String description;
     private Date dueDate;
@@ -9,7 +9,7 @@ public class tasks {
     private String category;
 
         // attribs
-    public tasks(String title, String description, Date dueDate, String priority, String status, String category) {
+    public Tasks(String title, String description, Date dueDate, String priority, String status, String category) {
         this.title = title;
         this.description = description;
         this.dueDate = dueDate;

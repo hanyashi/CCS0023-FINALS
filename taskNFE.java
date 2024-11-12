@@ -1,5 +1,5 @@
-public class taskNFE extends Exception {
-    public taskNFE(String message) {
+public class TaskNFE extends Exception {
+    public TaskNFE(String message) {
         super(message);
     }
 }

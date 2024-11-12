@@ -8,16 +8,17 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
-public class mainSushi {
+public class MainSushi {
     // instantiating Swing GUI shit
     private JTable taskTable;
     private DefaultTableModel tableModel;
-    private taskManager manager;
-    private JFrame mainFrame;
+    private final TaskManager manager;
+    private final JFrame mainFrame;
+    private UserManager userManager;
 
-    public mainSushi() {
+    public MainSushi() {
         // main frame settings
-        manager = new taskManager();
+        manager = new TaskManager();
         mainFrame = new JFrame("Sushi Beta 1.0");
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mainFrame.setSize(1000, 700);
@@ -29,6 +30,46 @@ public class mainSushi {
         mainFrame.setVisible(true);
         mainFrame.revalidate();
         mainFrame.repaint();
+        
+        // user stuff
+        userManager = new UserManager();
+        if (!loginWindow()) {
+            JOptionPane.showMessageDialog(null, "Login failed.");
+            System.exit(0);
+        }
+    }
+
+    private boolean loginWindow() {
+        JTextField usernameField = new JTextField(10);
+        JPasswordField passwordField = new JPasswordField(10);
+
+        int option = JOptionPane.showConfirmDialog(null, new Object[] {
+            "Username:", usernameField, 
+            "Password:", passwordField
+        }, "Login", JOptionPane.OK_CANCEL_OPTION);
+
+        if (option == JOptionPane.OK_OPTION) {
+            String username = usernameField.getText();
+            String password = new String(passwordField.getPassword());
+
+            // login attempt OR register attempt if the user is "new"
+            if (!userManager.loginUser(username, password)) {
+                int registerOption = JOptionPane.showConfirmDialog(null, "User not found. Would you like to register a new account?", "Register", JOptionPane.NO_OPTION);
+
+                if (registerOption == JOptionPane.YES_OPTION) {
+                    if (userManager.registerUser(username, password)) {
+                        return userManager.loginUser(username, password);  // logs in after reg
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Could not register. Please try again.");
+                    }
+                }
+            } else {
+                return false;
+            }
+        } else {
+            return true;
+        }
+        return false;
     }
 
     private void swingGUI() {
@@ -206,7 +247,7 @@ public class mainSushi {
             Date dueDate = (Date) dueDateSpinner.getValue();
             String category = categoryField.getText();
 
-            tasks task = new tasks(title, description, dueDate, priority, status, category);
+            Tasks task = new Tasks(title, description, dueDate, priority, status, category);
             manager.addTask(task);
             refreshTaskTable();
             JOptionPane.showMessageDialog(mainFrame, "Task added successfully.");
@@ -226,7 +267,7 @@ public class mainSushi {
                     refreshTaskTable();
                     JOptionPane.showMessageDialog(mainFrame, "Task deleted successfully.", "Delete Task",
                             JOptionPane.INFORMATION_MESSAGE);
-                } catch (taskNFE e) {
+                } catch (TaskNFE e) {
                     JOptionPane.showMessageDialog(mainFrame, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
@@ -241,7 +282,7 @@ public class mainSushi {
         int selectedRow = taskTable.getSelectedRow();
         if (selectedRow != -1) {
             String title = (String) taskTable.getValueAt(selectedRow, 0);
-            tasks task = manager.getTaskByTitle(title);
+            Tasks task = manager.getTaskByTitle(title);
 
             if (task != null) {
                 JTextField titleField = new JTextField(task.getTitle(), 10);
@@ -290,9 +331,9 @@ public class mainSushi {
     private void refreshTaskTable() {
         tableModel.setRowCount(0);
 
-        for (tasks task : manager.getAllTasks()) {
+        for (Tasks task : manager.getAllTasks()) {
             var localDateTime = LocalDateTime.ofInstant(task.getDueDate().toInstant(), ZoneId.systemDefault());
-            DateTimeFormatter myFormatObj = DateTimeFormatter.ofPattern("MMMM dd hh:mm a");
+            DateTimeFormatter myFormatObj = DateTimeFormatter.ofPattern("MMM dd hh:mm a");
             String formattedDate = localDateTime.format(myFormatObj);
             tableModel.addRow(new Object[] {
                     task.getTitle(),
@@ -307,6 +348,6 @@ public class mainSushi {
 
     // main method
     public static void main(String[] args) {
-        new mainSushi();
+        new MainSushi();
     }
 }
