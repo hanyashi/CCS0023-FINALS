@@ -1,6 +1,6 @@
 package com.sushi;
 
-// importz
+// imports
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -38,21 +38,24 @@ import javax.swing.plaf.basic.BasicComboBoxUI;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
+// main class
 public class MainSushi {
-    // instantiating Swing GUI shit
+
+    // GUI components (swing)
     private JTable taskTable;
     private DefaultTableModel tableModel;
     private final TaskManager manager;
     private final JFrame mainFrame;
 
+    // constructor
     public MainSushi() {
-        // main frame settings
         manager = new TaskManager();
         mainFrame = new JFrame("Sushi Beta 1.0");
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mainFrame.setSize(1000, 700);
         mainFrame.getContentPane().setBackground(Color.decode("#CCDAD1"));
         mainFrame.setResizable(false);
+
         ImageIcon logo = new ImageIcon(getClass().getClassLoader().getResource("assets/sushi-logo.png"));
         mainFrame.setIconImage(logo.getImage());
         swingGUI();
@@ -61,78 +64,69 @@ public class MainSushi {
         mainFrame.repaint();
     }
 
+    // main GUI setup
     private void swingGUI() {
-        // making the main frame's panel
-        JPanel mainPanel = new JPanel();
-        mainPanel.setBackground(Color.decode("#CCDAD1"));
-        tableModel = new DefaultTableModel(
-                new String[] { "Title", "Description", "Due Date", "Priority", "Status", "Category" }, 0) {
+        JPanel mainPanel = createMainPanel();
+        setupTable();
+        JScrollPane tableScrollPane = createTableScrollPane();
+        
+        mainPanel.add(createSpacerPanel(), BorderLayout.NORTH);
+        mainPanel.add(tableScrollPane, BorderLayout.CENTER);
+        setupTableBorders();
+        
+        mainFrame.add(mainPanel, BorderLayout.CENTER);
+        mainFrame.add(createTitlePanel(), BorderLayout.NORTH);
+        addSortDropdown(mainPanel);
+        
+        mainFrame.revalidate();
+        mainFrame.repaint();
+        refreshTaskTable();
+    }
+
+    // table setup methods
+    private void setupTable() {
+        tableModel = new DefaultTableModel(new String[] { "Title", "Description", "Due Date", "Priority", "Status", "Category" }, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
             }
         };
 
-        // TABLE
-        // making the table that the tasks will be in
         taskTable = new JTable(tableModel);
-
-        // table and header attributes
         taskTable.setFont(new Font("Montserrat", Font.PLAIN, 12));
         taskTable.setIntercellSpacing(new Dimension(0, 0));
         taskTable.getTableHeader().setBackground(Color.decode("#211A1E"));
         taskTable.getTableHeader().setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.BLACK));
         taskTable.setBackground(Color.decode("#211A1E"));
         taskTable.setFillsViewportHeight(true);
-        // UNREASONABLY COMPLICATED BORDER FOR THE TABLE
-        taskTable.getTableHeader().setDefaultRenderer(new DefaultTableCellRenderer() {
-            @Override
-            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-                    boolean hasFocus, int row, int column) {
-                Component comp = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-
-                ((JLabel) comp).setHorizontalAlignment(SwingConstants.CENTER);
-                ((JLabel) comp).setFont(new Font("Montserrat", Font.BOLD, 16));
-                ((JLabel) comp).setForeground(Color.decode("#CCDAD1"));
-                if (column < table.getColumnCount() - 1) { // needed it to only paint borders on specific cells like on
-                                                           // the last or first one, so that in-betweens can be generic
-                    ((JComponent) comp).setBorder(BorderFactory.createMatteBorder(0, 1, 1, 1, Color.decode("#211A1E")));
-                } else {
-                    ((JComponent) comp).setBorder(BorderFactory.createMatteBorder(0, 1, 1, 1, Color.decode("#211A1E")));
-                }
-
-                return comp;
-            }
-        });
-        //
-        // adds the table to a scrollpane panel then the scrollpane to a separate panel
         taskTable.setComponentPopupMenu(createTablePopupMenu());
+    }
+
+    private JScrollPane createTableScrollPane() {
         JScrollPane tableScrollPane = new JScrollPane(taskTable);
         tableScrollPane.setPreferredSize(new Dimension(900, 400));
         tableScrollPane.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.BLACK));
-        tableScrollPane.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.BLACK));
-        JPanel spacerPanel = new JPanel();
-        spacerPanel.setPreferredSize(new Dimension(700, 30));
-        spacerPanel.setBackground(Color.decode("#CCDAD1"));
-        mainPanel.add(spacerPanel, BorderLayout.NORTH);
-        mainPanel.add(tableScrollPane, BorderLayout.CENTER);
-        tableScrollPane.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.BLACK));
-        // sets the border for table elements (also unreasonably complex)
+        return tableScrollPane;
+    }
+
+    private void setupTableBorders() {
+        taskTable.getTableHeader().setDefaultRenderer(new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                label.setHorizontalAlignment(SwingConstants.CENTER);
+                label.setFont(new Font("Montserrat", Font.BOLD, 16));
+                label.setForeground(Color.decode("#CCDAD1"));
+                label.setBorder(BorderFactory.createMatteBorder(0, 1, 1, 1, Color.decode("#211A1E")));
+                return label;
+            }
+        });
+
         taskTable.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
             @Override
-            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-                    boolean hasFocus, int row, int column) {
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 Component comp = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-
-                if (column == 0 || column == 1 || column == 2) {
-                    ((JLabel) comp).setHorizontalAlignment(SwingConstants.LEFT);
-                } else {
-                    ((JLabel) comp).setHorizontalAlignment(SwingConstants.CENTER);
-                } // this block makes it so that only the name desc and due date are set to left and not centered
-                
-
-                ((JComponent) comp).setBorder(BorderFactory.createMatteBorder(
-                        1, 1, (row == table.getRowCount() - 1 ? 1 : 0), 1, Color.decode("#211A1E")));
+                ((JComponent) comp).setBorder(BorderFactory.createMatteBorder(1, 1, (row == table.getRowCount() - 1 ? 1 : 0), 1, Color.decode("#211A1E")));
 
                 Color alternateColor = Color.decode("#B5CBBC");
                 Color defaultColor = Color.decode("#CCDAD1");
@@ -147,21 +141,15 @@ public class MainSushi {
                 return comp;
             }
         });
-        //
-        // END OF TABLE
+    }
 
-        // adds the mainPanel (which contains the table and topPanel) to the JFrame
-        mainFrame.add(mainPanel, BorderLayout.CENTER);
-
-        // title panel at the top
+    // title panel creation
+    private JPanel createTitlePanel() {
         JPanel titlePanel = new JPanel(new BorderLayout());
         titlePanel.setBackground(Color.decode("#211A1E"));
         titlePanel.setPreferredSize(new Dimension(mainFrame.getWidth(), 70));
 
-        // label for title (left-aligned with padding on the left)
         JLabel title = new JLabel("Sushi Beta 1.0 ", SwingConstants.LEFT);
-        // ImageIcon logo = new
-        // ImageIcon("C:/Users/hanse/Desktop/CCS0023-FINALS-REPO/CCS0023-FINALS/assets/sushi-logo2.png");
         ImageIcon logo = new ImageIcon(getClass().getClassLoader().getResource("assets/sushi-logo2.png"));
         title.setIcon(logo);
         title.setIconTextGap(10);
@@ -170,10 +158,14 @@ public class MainSushi {
         title.setBorder(BorderFactory.createEmptyBorder(0, 30, 0, 0));
 
         titlePanel.add(title, BorderLayout.WEST);
+        titlePanel.add(createButtonPanel(), BorderLayout.EAST);
+        return titlePanel;
+    }
 
-        // wraps the button in another panel within the title panel because i'm the GOAT
+    private JPanel createButtonPanel() {
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 30, 15));
         buttonPanel.setBackground(Color.decode("#211A1E"));
+
         JButton addButton = new JButton("Add Task");
         addButton.addActionListener(e -> addTaskGUI());
         addButton.setFont(new Font("Montserrat", Font.BOLD, 14));
@@ -182,17 +174,26 @@ public class MainSushi {
         addButton.setForeground(Color.decode("#CCDAD1"));
         addButton.setFocusable(false);
 
-        // adds button to the buttonPanel and adds buttonPanel to the right of the title
-        // because CSS has never left my soul
         buttonPanel.add(addButton);
-        titlePanel.add(buttonPanel, BorderLayout.EAST);
+        return buttonPanel;
+    }
 
-        // adds title panel to the main frame at the top
-        mainFrame.add(titlePanel, BorderLayout.NORTH);
+    private JPanel createSpacerPanel() {
+        JPanel spacerPanel = new JPanel();
+        spacerPanel.setPreferredSize(new Dimension(700, 30));
+        spacerPanel.setBackground(Color.decode("#CCDAD1"));
+        return spacerPanel;
+    }
 
-        // dropdown menu for sorting!!
+    private JPanel createMainPanel() {
+        JPanel mainPanel = new JPanel();
+        mainPanel.setBackground(Color.decode("#CCDAD1"));
+        return mainPanel;
+    }
+
+    // dropdown menu setup
+    private void addSortDropdown(JPanel mainPanel) {
         JComboBox<String> sortBy = new JComboBox<>(new String[]{"Priority", "Name", "Due Date", "Status", "Category"});
-        
         mainPanel.add(sortBy, BorderLayout.EAST);
 
         sortBy.setUI(new BasicComboBoxUI() {
@@ -211,11 +212,9 @@ public class MainSushi {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
                 JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                
                 label.setHorizontalAlignment(SwingConstants.CENTER);
                 label.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.decode("#CCDAD1")));
                 label.setOpaque(true);
-        
                 return label;   
             }
         });
@@ -231,23 +230,12 @@ public class MainSushi {
         sortBy.setBackground(Color.decode("#211A1E"));
         sortBy.setFocusable(false);
         sortBy.setBorder(BorderFactory.createLineBorder(Color.decode("#211A1E")));
-
         sortBy.repaint();
-
-        // end of sortby
-
-
-        // ensures that the frame is updated accordingly
-        mainFrame.revalidate();
-        mainFrame.repaint();
-
-        refreshTaskTable();
     }
 
-    // right click menu
+    // pop-up menu for right-clicking tasks
     private JPopupMenu createTablePopupMenu() {
         JPopupMenu popupMenu = new JPopupMenu();
-
         JMenuItem editItem = new JMenuItem("Edit");
         editItem.addActionListener(e -> editSelectedTask());
 
@@ -256,29 +244,28 @@ public class MainSushi {
 
         popupMenu.add(editItem);
         popupMenu.add(deleteItem);
-
         return popupMenu;
     }
 
-    // method that is called when you click the add task button (has the UI for the
-    // task adding, will customize later0
+    // TASK MANAGEMENT METHODS
+    // add task method
     private void addTaskGUI() {
         JTextField titleField = new JTextField(10);
         JTextField descriptionField = new JTextField(10);
-        JComboBox<String> priorityBox = new JComboBox<>(new String[] { "High", "Medium", "Low" });
-        JComboBox<String> statusBox = new JComboBox<>(new String[] { "Pending", "Complete", "Overdue" });
+        JComboBox<String> priorityBox = new JComboBox<>(new String[] {"High", "Medium", "Low"});
+        JComboBox<String> statusBox = new JComboBox<>(new String[] {"Pending", "Complete", "Overdue"});
         JSpinner dueDateSpinner = new JSpinner(new SpinnerDateModel());
         JSpinner.DateEditor dateEditor = new JSpinner.DateEditor(dueDateSpinner, "MM-dd hh:mm a");
         dueDateSpinner.setEditor(dateEditor);
         JTextField categoryField = new JTextField(10);
 
         int result = JOptionPane.showConfirmDialog(mainFrame, new Object[] {
-                "Title:", titleField,
-                "Description:", descriptionField,
-                "Priority:", priorityBox,
-                "Status:", statusBox,
-                "Due Date:", dueDateSpinner,
-                "Category:", categoryField
+            "Title:", titleField,
+            "Description:", descriptionField,
+            "Priority:", priorityBox,
+            "Status:", statusBox,
+            "Due Date:", dueDateSpinner,
+            "Category:", categoryField
         }, "Add Task", JOptionPane.OK_CANCEL_OPTION);
 
         if (result == JOptionPane.OK_OPTION) {
@@ -297,31 +284,31 @@ public class MainSushi {
         }
     }
 
-    // self explanatory
+    // delete task method
     private void deleteSelectedTask() {
         int selectedRow = taskTable.getSelectedRow();
+
         if (selectedRow != -1) {
             String title = (String) taskTable.getValueAt(selectedRow, 0);
-            int confirm = JOptionPane.showConfirmDialog(mainFrame, "Are you sure you want to delete this task?",
-                    "Confirm Delete", JOptionPane.YES_NO_OPTION);
+            int confirm = JOptionPane.showConfirmDialog(mainFrame, "Are you sure you want to delete this task?", "Confirm Delete", JOptionPane.YES_NO_OPTION);
+
             if (confirm == JOptionPane.YES_OPTION) {
                 try {
                     manager.removeTask(title);
                     manager.saveTasks();
                     refreshTaskTable();
-                    JOptionPane.showMessageDialog(mainFrame, "Task deleted successfully.", "Delete Task",
-                            JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(mainFrame, "Task deleted successfully.", "Delete Task", JOptionPane.INFORMATION_MESSAGE);
                 } catch (TaskNFE e) {
                     JOptionPane.showMessageDialog(mainFrame, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
+
         } else {
-            JOptionPane.showMessageDialog(mainFrame, "Please select a task to delete.", "No Task Selected",
-                    JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(mainFrame, "Please select a task to delete.", "No Task Selected", JOptionPane.WARNING_MESSAGE);
         }
     }
 
-    // self explanatory
+    // edit task method
     private void editSelectedTask() {
         int selectedRow = taskTable.getSelectedRow();
         if (selectedRow != -1) {
@@ -335,22 +322,18 @@ public class MainSushi {
                 priorityBox.setSelectedItem(task.getPriority());
                 JComboBox<String> statusBox = new JComboBox<>(new String[] { "Pending", "Complete", "Overdue" });
                 statusBox.setSelectedItem(task.getStatus());
-                JSpinner dueDateSpinner = new JSpinner(
-                        new SpinnerDateModel(task.getDueDate(), null, null, java.util.Calendar.DAY_OF_MONTH)); // need
-                                                                                                               // to
-                                                                                                               // change
-                                                                                                               // this
+                JSpinner dueDateSpinner = new JSpinner(new SpinnerDateModel(task.getDueDate(), null, null, java.util.Calendar.DAY_OF_MONTH)); 
                 JSpinner.DateEditor dateEditor = new JSpinner.DateEditor(dueDateSpinner, "MM-dd hh:mm a");
                 dueDateSpinner.setEditor(dateEditor);
                 JTextField categoryField = new JTextField(task.getCategory(), 10);
 
                 int result = JOptionPane.showConfirmDialog(mainFrame, new Object[] {
-                        "Title:", titleField,
-                        "Description:", descriptionField,
-                        "Priority:", priorityBox,
-                        "Status:", statusBox,
-                        "Due Date:", dueDateSpinner,
-                        "Category:", categoryField
+                    "Title:", titleField,
+                    "Description:", descriptionField,
+                    "Priority:", priorityBox,
+                    "Status:", statusBox,
+                    "Due Date:", dueDateSpinner,
+                    "Category:", categoryField
                 }, "Edit Task", JOptionPane.OK_CANCEL_OPTION);
 
                 if (result == JOptionPane.OK_OPTION) {
@@ -362,17 +345,15 @@ public class MainSushi {
                     task.setCategory(categoryField.getText());
                     manager.saveTasks();
                     refreshTaskTable();
-                    JOptionPane.showMessageDialog(mainFrame, "Task updated successfully.", "Edit",
-                            JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(mainFrame, "Task updated successfully.", "Edit", JOptionPane.INFORMATION_MESSAGE);
                 }
             }
         } else {
-            JOptionPane.showMessageDialog(mainFrame, "Please select a task to edit.", "No Task Selected",
-                    JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(mainFrame, "Please select a task to edit.", "No Task Selected", JOptionPane.WARNING_MESSAGE);
         }
     }
 
-    // overloaded method
+    // overloaded method to call without string attrib
     private void refreshTaskTable() {
         refreshTaskTable("Priority");
     }
