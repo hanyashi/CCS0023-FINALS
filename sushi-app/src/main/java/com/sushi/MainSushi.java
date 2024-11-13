@@ -34,9 +34,13 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.SpinnerDateModel;
 import javax.swing.SwingConstants;
+import javax.swing.border.EmptyBorder;
 import javax.swing.plaf.basic.BasicComboBoxUI;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
+
+import com.sushi.gui.CheckBoxRenderer;
 
 // main class
 public class MainSushi {
@@ -68,16 +72,16 @@ public class MainSushi {
     private void swingGUI() {
         JPanel mainPanel = createMainPanel();
         setupTable();
-        JScrollPane tableScrollPane = createTableScrollPane();
-        
-        mainPanel.add(createSpacerPanel(), BorderLayout.NORTH);
-        mainPanel.add(tableScrollPane, BorderLayout.CENTER);
+
+        mainPanel.setBorder(new EmptyBorder(36, 12, 12, 12)); // padding
+
+        mainPanel.add(createTableScrollPane(), BorderLayout.CENTER);
+        mainPanel.add(createSortDropdown(), BorderLayout.EAST); // changed from addSortDropdown() for consistency
         setupTableBorders();
-        
+
         mainFrame.add(mainPanel, BorderLayout.CENTER);
         mainFrame.add(createTitlePanel(), BorderLayout.NORTH);
-        addSortDropdown(mainPanel);
-        
+
         mainFrame.revalidate();
         mainFrame.repaint();
         refreshTaskTable();
@@ -85,7 +89,28 @@ public class MainSushi {
 
     // table setup methods
     private void setupTable() {
-        tableModel = new DefaultTableModel(new String[] { "Title", "Description", "Due Date", "Priority", "Status", "Category" }, 0) {
+        tableModel = new DefaultTableModel(
+                new String[] { " ", "Title", "Description", "Due Date", "Priority", "Status", "Category" }, 0) {
+
+            // class definitions for the table model
+            @Override
+            public Class<?> getColumnClass(int column) { // define classes for each column
+                switch (column) {
+                    case 0:
+                        return Boolean.class;
+                    case 1:
+                    case 2:
+                    case 3:
+                    case 4:
+                    case 5:
+                    case 6:
+                        return String.class;
+
+                    default:
+                        return String.class;
+                }
+            }
+
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
@@ -93,6 +118,12 @@ public class MainSushi {
         };
 
         taskTable = new JTable(tableModel);
+
+        var completedColumn = taskTable.getColumn(" ");
+        completedColumn.setMaxWidth(24);
+        completedColumn.setCellRenderer(new CheckBoxRenderer());
+
+        taskTable.setRowHeight(24);
         taskTable.setFont(new Font("Montserrat", Font.PLAIN, 12));
         taskTable.setIntercellSpacing(new Dimension(0, 0));
         taskTable.getTableHeader().setBackground(Color.decode("#211A1E"));
@@ -112,8 +143,10 @@ public class MainSushi {
     private void setupTableBorders() {
         taskTable.getTableHeader().setDefaultRenderer(new DefaultTableCellRenderer() {
             @Override
-            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-                JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+                    boolean hasFocus, int row, int column) {
+                JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row,
+                        column);
                 label.setHorizontalAlignment(SwingConstants.CENTER);
                 label.setFont(new Font("Montserrat", Font.BOLD, 16));
                 label.setForeground(Color.decode("#CCDAD1"));
@@ -124,9 +157,11 @@ public class MainSushi {
 
         taskTable.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
             @Override
-            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+                    boolean hasFocus, int row, int column) {
                 Component comp = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                ((JComponent) comp).setBorder(BorderFactory.createMatteBorder(1, 1, (row == table.getRowCount() - 1 ? 1 : 0), 1, Color.decode("#211A1E")));
+                ((JComponent) comp).setBorder(BorderFactory.createMatteBorder(1, 1,
+                        (row == table.getRowCount() - 1 ? 1 : 0), 1, Color.decode("#211A1E")));
 
                 Color alternateColor = Color.decode("#B5CBBC");
                 Color defaultColor = Color.decode("#CCDAD1");
@@ -141,6 +176,7 @@ public class MainSushi {
                 return comp;
             }
         });
+
     }
 
     // title panel creation
@@ -178,13 +214,6 @@ public class MainSushi {
         return buttonPanel;
     }
 
-    private JPanel createSpacerPanel() {
-        JPanel spacerPanel = new JPanel();
-        spacerPanel.setPreferredSize(new Dimension(700, 30));
-        spacerPanel.setBackground(Color.decode("#CCDAD1"));
-        return spacerPanel;
-    }
-
     private JPanel createMainPanel() {
         JPanel mainPanel = new JPanel();
         mainPanel.setBackground(Color.decode("#CCDAD1"));
@@ -192,9 +221,9 @@ public class MainSushi {
     }
 
     // dropdown menu setup
-    private void addSortDropdown(JPanel mainPanel) {
-        JComboBox<String> sortBy = new JComboBox<>(new String[]{"Priority", "Name", "Due Date", "Status", "Category"});
-        mainPanel.add(sortBy, BorderLayout.EAST);
+    private JComboBox<String> createSortDropdown() {
+        JComboBox<String> sortBy = new JComboBox<>(
+                new String[] { "Priority", "Name", "Due Date", "Status", "Category" });
 
         sortBy.setUI(new BasicComboBoxUI() {
             @Override
@@ -210,12 +239,14 @@ public class MainSushi {
 
         sortBy.setRenderer(new DefaultListCellRenderer() {
             @Override
-            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-                JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
+                    boolean cellHasFocus) {
+                JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected,
+                        cellHasFocus);
                 label.setHorizontalAlignment(SwingConstants.CENTER);
                 label.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.decode("#CCDAD1")));
                 label.setOpaque(true);
-                return label;   
+                return label;
             }
         });
 
@@ -231,6 +262,7 @@ public class MainSushi {
         sortBy.setFocusable(false);
         sortBy.setBorder(BorderFactory.createLineBorder(Color.decode("#211A1E")));
         sortBy.repaint();
+        return sortBy;
     }
 
     // pop-up menu for right-clicking tasks
@@ -252,20 +284,20 @@ public class MainSushi {
     private void addTaskGUI() {
         JTextField titleField = new JTextField(10);
         JTextField descriptionField = new JTextField(10);
-        JComboBox<String> priorityBox = new JComboBox<>(new String[] {"High", "Medium", "Low"});
-        JComboBox<String> statusBox = new JComboBox<>(new String[] {"Pending", "Complete", "Overdue"});
+        JComboBox<String> priorityBox = new JComboBox<>(new String[] { "High", "Medium", "Low" });
+        JComboBox<String> statusBox = new JComboBox<>(new String[] { "Pending", "Complete", "Overdue" });
         JSpinner dueDateSpinner = new JSpinner(new SpinnerDateModel());
         JSpinner.DateEditor dateEditor = new JSpinner.DateEditor(dueDateSpinner, "MM-dd hh:mm a");
         dueDateSpinner.setEditor(dateEditor);
         JTextField categoryField = new JTextField(10);
 
         int result = JOptionPane.showConfirmDialog(mainFrame, new Object[] {
-            "Title:", titleField,
-            "Description:", descriptionField,
-            "Priority:", priorityBox,
-            "Status:", statusBox,
-            "Due Date:", dueDateSpinner,
-            "Category:", categoryField
+                "Title:", titleField,
+                "Description:", descriptionField,
+                "Priority:", priorityBox,
+                "Status:", statusBox,
+                "Due Date:", dueDateSpinner,
+                "Category:", categoryField
         }, "Add Task", JOptionPane.OK_CANCEL_OPTION);
 
         if (result == JOptionPane.OK_OPTION) {
@@ -290,21 +322,24 @@ public class MainSushi {
 
         if (selectedRow != -1) {
             String title = (String) taskTable.getValueAt(selectedRow, 0);
-            int confirm = JOptionPane.showConfirmDialog(mainFrame, "Are you sure you want to delete this task?", "Confirm Delete", JOptionPane.YES_NO_OPTION);
+            int confirm = JOptionPane.showConfirmDialog(mainFrame, "Are you sure you want to delete this task?",
+                    "Confirm Delete", JOptionPane.YES_NO_OPTION);
 
             if (confirm == JOptionPane.YES_OPTION) {
                 try {
                     manager.removeTask(title);
                     manager.saveTasks();
                     refreshTaskTable();
-                    JOptionPane.showMessageDialog(mainFrame, "Task deleted successfully.", "Delete Task", JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(mainFrame, "Task deleted successfully.", "Delete Task",
+                            JOptionPane.INFORMATION_MESSAGE);
                 } catch (TaskNFE e) {
                     JOptionPane.showMessageDialog(mainFrame, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
 
         } else {
-            JOptionPane.showMessageDialog(mainFrame, "Please select a task to delete.", "No Task Selected", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(mainFrame, "Please select a task to delete.", "No Task Selected",
+                    JOptionPane.WARNING_MESSAGE);
         }
     }
 
@@ -322,18 +357,19 @@ public class MainSushi {
                 priorityBox.setSelectedItem(task.getPriority());
                 JComboBox<String> statusBox = new JComboBox<>(new String[] { "Pending", "Complete", "Overdue" });
                 statusBox.setSelectedItem(task.getStatus());
-                JSpinner dueDateSpinner = new JSpinner(new SpinnerDateModel(task.getDueDate(), null, null, java.util.Calendar.DAY_OF_MONTH)); 
+                JSpinner dueDateSpinner = new JSpinner(
+                        new SpinnerDateModel(task.getDueDate(), null, null, java.util.Calendar.DAY_OF_MONTH));
                 JSpinner.DateEditor dateEditor = new JSpinner.DateEditor(dueDateSpinner, "MM-dd hh:mm a");
                 dueDateSpinner.setEditor(dateEditor);
                 JTextField categoryField = new JTextField(task.getCategory(), 10);
 
                 int result = JOptionPane.showConfirmDialog(mainFrame, new Object[] {
-                    "Title:", titleField,
-                    "Description:", descriptionField,
-                    "Priority:", priorityBox,
-                    "Status:", statusBox,
-                    "Due Date:", dueDateSpinner,
-                    "Category:", categoryField
+                        "Title:", titleField,
+                        "Description:", descriptionField,
+                        "Priority:", priorityBox,
+                        "Status:", statusBox,
+                        "Due Date:", dueDateSpinner,
+                        "Category:", categoryField
                 }, "Edit Task", JOptionPane.OK_CANCEL_OPTION);
 
                 if (result == JOptionPane.OK_OPTION) {
@@ -345,11 +381,13 @@ public class MainSushi {
                     task.setCategory(categoryField.getText());
                     manager.saveTasks();
                     refreshTaskTable();
-                    JOptionPane.showMessageDialog(mainFrame, "Task updated successfully.", "Edit", JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(mainFrame, "Task updated successfully.", "Edit",
+                            JOptionPane.INFORMATION_MESSAGE);
                 }
             }
         } else {
-            JOptionPane.showMessageDialog(mainFrame, "Please select a task to edit.", "No Task Selected", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(mainFrame, "Please select a task to edit.", "No Task Selected",
+                    JOptionPane.WARNING_MESSAGE);
         }
     }
 
@@ -362,7 +400,7 @@ public class MainSushi {
     private void refreshTaskTable(String sortBy) {
         tableModel.setRowCount(0);
         List<Tasks> tasks = manager.getAllTasks();
-        
+
         Comparator<Tasks> comparator = null;
 
         switch (sortBy) {
@@ -378,7 +416,7 @@ public class MainSushi {
                         default:
                             return Integer.MAX_VALUE;
                     }
-            });
+                });
                 break;
             case "Name":
                 comparator = Comparator.comparing(Tasks::getTitle);
@@ -390,7 +428,7 @@ public class MainSushi {
                 comparator = Comparator.comparingInt(task -> {
                     switch (task.getStatus()) {
                         case "Overdue":
-                            return 0; 
+                            return 0;
                         case "Pending":
                             return 1;
                         case "Completed":
@@ -404,8 +442,8 @@ public class MainSushi {
                 comparator = Comparator.comparing(Tasks::getCategory);
                 break;
             default:
-            break;
-            
+                break;
+
         }
 
         if (comparator != null) {
@@ -413,16 +451,16 @@ public class MainSushi {
         }
 
         // Collections.sort(tasks, Comparator.comparingInt(task -> {
-        //     switch (task.getPriority()) {
-        //         case "High":
-        //             return 0;
-        //         case "Medium":
-        //             return 1;
-        //         case "Low":
-        //             return 2;
-        //         default:
-        //             return Integer.MAX_VALUE;
-        //     } // this is clever! good job!
+        // switch (task.getPriority()) {
+        // case "High":
+        // return 0;
+        // case "Medium":
+        // return 1;
+        // case "Low":
+        // return 2;
+        // default:
+        // return Integer.MAX_VALUE;
+        // } // this is clever! good job!
         // }));
 
         for (Tasks task : manager.getAllTasks()) {
@@ -430,6 +468,7 @@ public class MainSushi {
             DateTimeFormatter myFormatObj = DateTimeFormatter.ofPattern("MMM dd hh:mm a");
             String formattedDate = localDateTime.format(myFormatObj);
             tableModel.addRow(new Object[] {
+                    false, // checkbox column
                     task.getTitle(),
                     task.getDescription(),
                     formattedDate,
