@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListCellRenderer;
@@ -32,14 +33,14 @@ import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
 import javax.swing.SpinnerDateModel;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.plaf.basic.BasicComboBoxUI;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellRenderer;
-
+import com.sushi.gui.CheckBoxEditor;
 import com.sushi.gui.CheckBoxRenderer;
 
 // main class
@@ -85,25 +86,28 @@ public class MainSushi {
         mainFrame.revalidate();
         mainFrame.repaint();
         refreshTaskTable();
+
     }
 
     // table setup methods
     private void setupTable() {
         tableModel = new DefaultTableModel(
-                new String[] { " ", "Title", "Description", "Due Date", "Priority", "Status", "Category" }, 0) {
+                new String[] { "UUID", " ", "Title", "Description", "Due Date", "Priority", "Status", "Category" }, 0) {
 
             // class definitions for the table model
             @Override
             public Class<?> getColumnClass(int column) { // define classes for each column
                 switch (column) {
                     case 0:
-                        return Boolean.class;
+                        return String.class;
                     case 1:
+                        return Boolean.class;
                     case 2:
                     case 3:
                     case 4:
                     case 5:
                     case 6:
+                    case 7:
                         return String.class;
 
                     default:
@@ -113,7 +117,7 @@ public class MainSushi {
 
             @Override
             public boolean isCellEditable(int row, int column) {
-                return false;
+                return column == 1;
             }
         };
 
@@ -122,7 +126,9 @@ public class MainSushi {
         var completedColumn = taskTable.getColumn(" ");
         completedColumn.setMaxWidth(24);
         completedColumn.setCellRenderer(new CheckBoxRenderer());
+        completedColumn.setCellEditor(new CheckBoxEditor());
 
+        taskTable.putClientProperty("terminateEditOnFocusLost", true);
         taskTable.setRowHeight(24);
         taskTable.setFont(new Font("Montserrat", Font.PLAIN, 12));
         taskTable.setIntercellSpacing(new Dimension(0, 0));
@@ -131,6 +137,28 @@ public class MainSushi {
         taskTable.setBackground(Color.decode("#211A1E"));
         taskTable.setFillsViewportHeight(true);
         taskTable.setComponentPopupMenu(createTablePopupMenu());
+
+        taskTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+        // Event listener
+        taskTable.getModel().addTableModelListener((e) -> {
+            int row = e.getFirstRow();
+            int column = e.getColumn();
+
+            if (column == 1) {
+                Boolean isCompleted = (Boolean) taskTable.getValueAt(row, column);
+                String taskTitle = (String) tableModel.getValueAt(row, 0);
+                Task task = manager.getTaskById(taskTitle);
+
+                if (task != null) {
+                    task.setStatus(isCompleted ? "Completed" : "Pending");
+                    task.setCompleted(isCompleted);
+                    manager.saveTasks();
+                    refreshTaskTable();
+                }
+            }
+
+        });
     }
 
     private JScrollPane createTableScrollPane() {
@@ -308,7 +336,7 @@ public class MainSushi {
             Date dueDate = (Date) dueDateSpinner.getValue();
             String category = categoryField.getText();
 
-            Tasks task = new Tasks(title, description, dueDate, priority, status, category);
+            Task task = new Task(false, title, description, dueDate, priority, status, category);
             manager.addTask(task);
             manager.saveTasks();
             refreshTaskTable();
@@ -348,7 +376,7 @@ public class MainSushi {
         int selectedRow = taskTable.getSelectedRow();
         if (selectedRow != -1) {
             String title = (String) taskTable.getValueAt(selectedRow, 0);
-            Tasks task = manager.getTaskByTitle(title);
+            Task task = manager.getTaskById(title);
 
             if (task != null) {
                 JTextField titleField = new JTextField(task.getTitle(), 10);
@@ -399,9 +427,9 @@ public class MainSushi {
     // refreshes every time a task has been edited, added, OR deleted
     private void refreshTaskTable(String sortBy) {
         tableModel.setRowCount(0);
-        List<Tasks> tasks = manager.getAllTasks();
+        List<Task> tasks = manager.getAllTasks();
 
-        Comparator<Tasks> comparator = null;
+        Comparator<Task> comparator = null;
 
         switch (sortBy) {
             case "Priority":
@@ -419,7 +447,7 @@ public class MainSushi {
                 });
                 break;
             case "Name":
-                comparator = Comparator.comparing(Tasks::getTitle);
+                comparator = Comparator.comparing(Task::getTitle);
                 break;
             case "Due Date":
                 comparator = Comparator.comparing(task -> task.getDueDate());
@@ -439,7 +467,7 @@ public class MainSushi {
                 });
                 break;
             case "Category":
-                comparator = Comparator.comparing(Tasks::getCategory);
+                comparator = Comparator.comparing(Task::getCategory);
                 break;
             default:
                 break;
@@ -463,12 +491,13 @@ public class MainSushi {
         // } // this is clever! good job!
         // }));
 
-        for (Tasks task : manager.getAllTasks()) {
+        for (Task task : manager.getAllTasks()) {
             var localDateTime = LocalDateTime.ofInstant(task.getDueDate().toInstant(), ZoneId.systemDefault());
             DateTimeFormatter myFormatObj = DateTimeFormatter.ofPattern("MMM dd hh:mm a");
             String formattedDate = localDateTime.format(myFormatObj);
             tableModel.addRow(new Object[] {
-                    false, // checkbox column
+                    task.getId().toString(),
+                    task.getCompleted(), // checkbox column
                     task.getTitle(),
                     task.getDescription(),
                     formattedDate,

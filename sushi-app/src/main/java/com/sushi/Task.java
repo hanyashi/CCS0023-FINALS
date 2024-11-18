@@ -1,8 +1,11 @@
 package com.sushi;
 
 import java.util.Date;
+import java.util.UUID;
 
-public class Tasks {
+public class Task {
+    private UUID id;
+    private Boolean completed;
     private String title;
     private String description;
     private Date dueDate;
@@ -10,8 +13,13 @@ public class Tasks {
     private String status;
     private String category;
 
-        // attribs
-    public Tasks(String title, String description, Date dueDate, String priority, String status, String category) {
+    // TODO: Make unique identifier for Task
+
+    // attributes
+    public Task(Boolean completed, String title, String description, Date dueDate, String priority,
+            String status,
+            String category) {
+        this.completed = completed;
         this.title = title;
         this.description = description;
         this.dueDate = dueDate;
@@ -20,8 +28,23 @@ public class Tasks {
         this.category = category;
     }
 
-        // SETTERS & GETTERS FOR ATTRIBS
-    public String getCategory() {  
+    // SETTERS & GETTERS FOR ATTRIBUTES
+    public UUID getId() {
+        if (id == null) {
+            id = UUID.randomUUID();
+        }
+        return id;
+    }
+
+    public Boolean getCompleted() {
+        return completed;
+    }
+
+    public void setCompleted(Boolean completed) {
+        this.completed = completed;
+    }
+
+    public String getCategory() {
         return category;
     }
 
