@@ -14,7 +14,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListCellRenderer;
@@ -36,10 +35,13 @@ import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.SpinnerDateModel;
 import javax.swing.SwingConstants;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.EmptyBorder;
-import javax.swing.plaf.basic.BasicComboBoxUI;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+
+import com.formdev.flatlaf.FlatLightLaf;
 import com.sushi.gui.CheckBoxEditor;
 import com.sushi.gui.CheckBoxRenderer;
 
@@ -54,6 +56,7 @@ public class MainSushi {
 
     // constructor
     public MainSushi() {
+        Font defaultFont = new Font("Montserrat", Font.BOLD, 12);
         manager = new TaskManager();
         mainFrame = new JFrame("Sushi Beta 1.0");
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -253,18 +256,6 @@ public class MainSushi {
         JComboBox<String> sortBy = new JComboBox<>(
                 new String[] { "Priority", "Name", "Due Date", "Status", "Category" });
 
-        sortBy.setUI(new BasicComboBoxUI() {
-            @Override
-            protected JButton createArrowButton() {
-                JButton arrowButton = super.createArrowButton();
-                arrowButton.setBackground(Color.decode("#211A1E"));
-                arrowButton.setForeground(Color.decode("#211A1E"));
-                arrowButton.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.decode("#211A1E")));
-                arrowButton.setFocusable(false);
-                return arrowButton;
-            }
-        });
-
         sortBy.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
@@ -284,8 +275,8 @@ public class MainSushi {
         });
 
         sortBy.setPreferredSize(new Dimension(100, 25));
-        sortBy.setFont(new Font("Montserrat", Font.PLAIN, 12));
-        sortBy.setForeground(Color.decode("#211A1E"));
+        sortBy.setFont(new Font("Montserrat", Font.BOLD, 12));
+        sortBy.setForeground(Color.decode("#CCDAD1"));
         sortBy.setBackground(Color.decode("#211A1E"));
         sortBy.setFocusable(false);
         sortBy.setBorder(BorderFactory.createLineBorder(Color.decode("#211A1E")));
@@ -296,12 +287,17 @@ public class MainSushi {
     // pop-up menu for right-clicking tasks
     private JPopupMenu createTablePopupMenu() {
         JPopupMenu popupMenu = new JPopupMenu();
+        Font defaultFont = new Font("Montserrat", Font.PLAIN, 12);
+        UIManager.put("editItem.font", defaultFont);
+
         JMenuItem editItem = new JMenuItem("Edit");
         editItem.addActionListener(e -> editSelectedTask());
 
         JMenuItem deleteItem = new JMenuItem("Delete");
         deleteItem.addActionListener(e -> deleteSelectedTask());
 
+        editItem.setFont(defaultFont);
+        deleteItem.setFont(defaultFont);
         popupMenu.add(editItem);
         popupMenu.add(deleteItem);
         return popupMenu;
@@ -507,9 +503,19 @@ public class MainSushi {
             });
         }
     }
-
+                   
     // main method
-    public static void main(String[] args) {
+    public static void main(String[] args) throws UnsupportedLookAndFeelException {
+        Font defaultFont = new Font("Montserrat", Font.PLAIN, 12);
+        UIManager.setLookAndFeel(new FlatLightLaf());
+        UIManager.put("OptionPane.messageFont", new Font("Montserrat", Font.BOLD, 12));
+        UIManager.put("OptionPane.buttonFont", defaultFont); 
+        UIManager.put("OptionPane.font", defaultFont); 
+        UIManager.put("OptionPane.background", new Color(204, 218, 209));
+        UIManager.put("OptionPane.messageForeground", new Color(33, 26, 30));
+        UIManager.put("TextField.font", defaultFont);
+        UIManager.put("ComboBox.font", defaultFont);
+        UIManager.put("Spinner.font", defaultFont);
         new MainSushi();
     }
 }
