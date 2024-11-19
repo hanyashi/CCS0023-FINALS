@@ -1,9 +1,12 @@
 package com.sushi.gui;
 
-import javax.swing.*;
-import javax.swing.table.TableCellEditor;
-import java.awt.*;
+import java.awt.Component;
 import java.util.EventObject;
+
+import javax.swing.AbstractCellEditor;
+import javax.swing.JCheckBox;
+import javax.swing.JTable;
+import javax.swing.table.TableCellEditor;
 
 public class CheckBoxEditor extends AbstractCellEditor implements TableCellEditor {
 

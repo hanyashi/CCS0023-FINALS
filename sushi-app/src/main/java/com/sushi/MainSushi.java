@@ -338,6 +338,7 @@ public class MainSushi {
             refreshTaskTable();
             JOptionPane.showMessageDialog(mainFrame, "Task added successfully.");
         }
+        System.out.println("Hi! You are in the addtask method.");
     }
 
     // delete task method

@@ -1,13 +1,14 @@
 package com.sushi.gui;
 
-import javax.swing.table.TableCellRenderer;
-import javax.swing.JPanel;
-import javax.swing.JTable;
-import javax.swing.BorderFactory;
-import javax.swing.JCheckBox;
-import java.awt.Component;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
+
+import javax.swing.BorderFactory;
+import javax.swing.JCheckBox;
+import javax.swing.JPanel;
+import javax.swing.JTable;
+import javax.swing.table.TableCellRenderer;
 
 public class CheckBoxRenderer extends JPanel implements TableCellRenderer {
 
@@ -20,6 +21,7 @@ public class CheckBoxRenderer extends JPanel implements TableCellRenderer {
         add(checkBox, BorderLayout.CENTER);
     }
 
+    @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
             boolean hasFocus, int row, int column) {
 
