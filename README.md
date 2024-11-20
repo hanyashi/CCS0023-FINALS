@@ -15,7 +15,7 @@
 
 ## Technical Details
 - **Programming Language:** Java
-- **Framework:** Swing (for GUI)
+- **Framework:** Swing, AWT
 - **Build Tool:** Maven
 - **Topics and Concepts Utilized:**
     - Encapsulation, Inheritance, Polymorphism, Abstraction
