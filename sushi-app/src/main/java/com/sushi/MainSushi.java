@@ -4,9 +4,11 @@ package com.sushi;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.font.TextAttribute;
 import java.text.AttributedString;
 import java.time.LocalDateTime;
@@ -15,17 +17,21 @@ import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
-import javax.swing.DefaultListCellRenderer;
+import javax.swing.Box;
+import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -40,6 +46,7 @@ import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.EmptyBorder;
+import javax.swing.plaf.metal.MetalButtonUI;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
@@ -79,15 +86,14 @@ public class MainSushi {
         JPanel mainPanel = createMainPanel();
         setupTable();
 
-        mainPanel.setBorder(new EmptyBorder(36, 12, 12, 12)); // padding
+        mainPanel.setBorder(new EmptyBorder(0, 12, 12, 12)); // padding
 
         mainPanel.add(createTableScrollPane(), BorderLayout.CENTER);
-        mainPanel.add(createSortDropdown(), BorderLayout.EAST); // changed from addSortDropdown() for consistency
         setupTableBorders();
 
         mainFrame.add(mainPanel, BorderLayout.CENTER);
-        mainFrame.add(createTitlePanel(), BorderLayout.NORTH);
 
+        mainFrame.add(createContainerPanel(), BorderLayout.NORTH);
         mainFrame.revalidate();
         mainFrame.repaint();
         refreshTaskTable();
@@ -227,11 +233,20 @@ public class MainSushi {
 
     }
 
+    private JPanel createContainerPanel() {
+        JPanel containerPanel = new JPanel(new BorderLayout());
+        containerPanel.setPreferredSize(new Dimension(mainFrame.getWidth(), 144));
+        containerPanel.add(createTitlePanel(), BorderLayout.NORTH);
+        containerPanel.add(createButtonPanel());
+
+        return containerPanel;
+    }
+
     // title panel creation
     private JPanel createTitlePanel() {
         JPanel titlePanel = new JPanel(new BorderLayout());
         titlePanel.setBackground(Color.decode("#211A1E"));
-        titlePanel.setPreferredSize(new Dimension(mainFrame.getWidth(), 70));
+        titlePanel.setPreferredSize(new Dimension(mainFrame.getWidth(), 75));
 
         JLabel title = new JLabel("Sushi Beta 1.0 ", SwingConstants.LEFT);
         ImageIcon logo = new ImageIcon(getClass().getClassLoader().getResource("assets/sushi-logo2.png"));
@@ -241,24 +256,88 @@ public class MainSushi {
         title.setForeground(Color.decode("#FF8552"));
         title.setBorder(BorderFactory.createEmptyBorder(0, 30, 0, 0));
 
+        JButton profileButton = new JButton(logo);
+        profileButton.addActionListener(e -> addTaskGUI());
+        profileButton.setBackground(Color.decode("#211A1E"));
+        profileButton.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 30));
+        profileButton.setFocusPainted(false);
+        profileButton.setRolloverEnabled(false);
+        profileButton.setFocusable(false);
+        profileButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        profileButton.setUI(new MetalButtonUI() {
+        @Override
+        protected void paintButtonPressed(Graphics g, AbstractButton b) {
+        }
+    });
+
         titlePanel.add(title, BorderLayout.WEST);
-        titlePanel.add(createButtonPanel(), BorderLayout.EAST);
+        titlePanel.add(profileButton, BorderLayout.EAST);
         return titlePanel;
     }
 
     private JPanel createButtonPanel() {
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 30, 15));
-        buttonPanel.setBackground(Color.decode("#211A1E"));
+        ImageIcon logo = new ImageIcon(getClass().getClassLoader().getResource("assets/sushi-logo3.png"));
 
-        JButton addButton = new JButton("Add Task");
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        buttonPanel.setBackground(Color.decode("#CCDAD1"));
+        buttonPanel.setBorder(new EmptyBorder(24, 36, 12, 36));
+
+        JButton addButton = new JButton("Add Task", logo);
         addButton.addActionListener(e -> addTaskGUI());
         addButton.setFont(new Font("Montserrat", Font.BOLD, 14));
-        addButton.setPreferredSize(new Dimension(120, 40));
+        addButton.setPreferredSize(new Dimension(140, 40));
         addButton.setBackground(Color.decode("#211A1E"));
         addButton.setForeground(Color.decode("#CCDAD1"));
         addButton.setFocusable(false);
+        addButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        JButton filterButton = new JButton("Filter", logo);
+        filterButton.addActionListener(e -> addTaskGUI());
+        filterButton.setFont(new Font("Montserrat", Font.BOLD, 14));
+        filterButton.setPreferredSize(new Dimension(120, 40));
+        filterButton.setBackground(Color.decode("#211A1E"));
+        filterButton.setForeground(Color.decode("#CCDAD1"));
+        filterButton.setFocusable(false);
+        filterButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        JButton sortButton = new JButton("Sort By", logo);
+        sortButton.setPreferredSize(new Dimension(125, 40));
+        sortButton.setFont(new Font("Montserrat", Font.BOLD, 14));
+        sortButton.setBackground(Color.decode("#211A1E"));
+        sortButton.setForeground(Color.decode("#CCDAD1"));
+        sortButton.setFocusable(false);
+        sortButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        JPopupMenu dropdownMenu = new JPopupMenu();
+        dropdownMenu.setBackground(Color.decode("#211A1E"));
+    
+        String[] options = { "Priority", "Name", "Due Date", "Status", "Category" };
+        ButtonGroup buttonGroup = new ButtonGroup();
+        Map<String, JCheckBoxMenuItem> menuItems = new HashMap<>();
+
+        for (String option : options) {
+            JCheckBoxMenuItem menuItem = new JCheckBoxMenuItem(option);
+            menuItem.setFont(new Font("Montserrat", Font.PLAIN, 12));
+            menuItem.setBackground(Color.decode("#211A1E"));
+            menuItem.setForeground(Color.decode("#CCDAD1"));
+            menuItem.addActionListener(e -> {
+                refreshTaskTable(option);
+                menuItems.values().forEach(item -> item.setSelected(false));
+                menuItem.setSelected(true);
+            });
+
+        menuItems.put(option, menuItem);
+        buttonGroup.add(menuItem);
+        dropdownMenu.add(menuItem);
+    }
+
+    sortButton.addActionListener(e -> dropdownMenu.show(sortButton, 0, sortButton.getHeight()));
 
         buttonPanel.add(addButton);
+        buttonPanel.add(Box.createRigidArea(new Dimension(10, 0))); // 20px horizontal gap (it's invisible, tried using flowlayout hgap but it also added a gap before the add button)
+        buttonPanel.add(filterButton);
+        buttonPanel.add(Box.createRigidArea(new Dimension(486, 0)));
+        buttonPanel.add(sortButton, BorderLayout.EAST);
         return buttonPanel;
     }
 
@@ -266,39 +345,6 @@ public class MainSushi {
         JPanel mainPanel = new JPanel();
         mainPanel.setBackground(Color.decode("#CCDAD1"));
         return mainPanel;
-    }
-
-    // dropdown menu setup
-    private JComboBox<String> createSortDropdown() {
-        JComboBox<String> sortBy = new JComboBox<>(
-                new String[] { "Priority", "Name", "Due Date", "Status", "Category" });
-
-        sortBy.setRenderer(new DefaultListCellRenderer() {
-            @Override
-            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
-                    boolean cellHasFocus) {
-                JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected,
-                        cellHasFocus);
-                label.setHorizontalAlignment(SwingConstants.CENTER);
-                label.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.decode("#CCDAD1")));
-                label.setOpaque(true);
-                return label;
-            }
-        });
-
-        sortBy.addActionListener(e -> {
-            String selectedOption = (String) sortBy.getSelectedItem();
-            refreshTaskTable(selectedOption);
-        });
-
-        sortBy.setPreferredSize(new Dimension(100, 25));
-        sortBy.setFont(new Font("Montserrat", Font.BOLD, 12));
-        sortBy.setForeground(Color.decode("#CCDAD1"));
-        sortBy.setBackground(Color.decode("#211A1E"));
-        sortBy.setFocusable(false);
-        sortBy.setBorder(BorderFactory.createLineBorder(Color.decode("#211A1E")));
-        sortBy.repaint();
-        return sortBy;
     }
 
     // pop-up menu for right-clicking tasks
@@ -514,7 +560,7 @@ public class MainSushi {
         for (Task task : manager.getAllTasks()) {
             var localDateTime = LocalDateTime.ofInstant(task.getDueDate().toInstant(), ZoneId.systemDefault());
             DateTimeFormatter myFormatObj = DateTimeFormatter.ofPattern("MMM dd hh:mm a");
-            String formattedDate = localDateTime.format(myFormatObj);
+            String formattedDate = localDateTime.format(myFormatObj);           
             tableModel.addRow(new Object[] {
                     task.getId().toString(),
                     task.getCompleted(), // checkbox column
