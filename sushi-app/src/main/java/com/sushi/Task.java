@@ -12,6 +12,7 @@ public class Task {
     private String priority;
     private String status;
     private String category;
+    private String previousStatus;
 
     // TODO: Make unique identifier for Task
 
@@ -25,6 +26,7 @@ public class Task {
         this.dueDate = dueDate;
         this.priority = priority;
         this.status = status;
+        this.previousStatus = status;
         this.category = category;
     }
 
@@ -34,6 +36,14 @@ public class Task {
             id = UUID.randomUUID();
         }
         return id;
+    }
+
+    public String getPreviousStatus() {
+        return previousStatus;
+    }
+
+    public void setPreviousStatus(String previousStatus) {
+        this.previousStatus = previousStatus;
     }
 
     public Boolean getCompleted() {

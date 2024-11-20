@@ -7,6 +7,8 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.font.TextAttribute;
+import java.text.AttributedString;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -95,23 +97,16 @@ public class MainSushi {
     // table setup methods
     private void setupTable() {
         tableModel = new DefaultTableModel(
-                new String[] { "UUID", " ", "Title", "Description", "Due Date", "Priority", "Status", "Category" }, 0) {
+                new String[] { "UUID", " ", "Title", "Description", "Due Date", "Priority", "Prev. Status", "Status",
+                        "Category" },
+                0) {
 
             // class definitions for the table model
             @Override
             public Class<?> getColumnClass(int column) { // define classes for each column
                 switch (column) {
-                    case 0:
-                        return String.class;
                     case 1:
                         return Boolean.class;
-                    case 2:
-                    case 3:
-                    case 4:
-                    case 5:
-                    case 6:
-                    case 7:
-                        return String.class;
 
                     default:
                         return String.class;
@@ -131,6 +126,17 @@ public class MainSushi {
         completedColumn.setCellRenderer(new CheckBoxRenderer());
         completedColumn.setCellEditor(new CheckBoxEditor());
 
+        // Makes UUID Column invisible
+        var uuidColumn = taskTable.getColumn("UUID");
+        uuidColumn.setMinWidth(0);
+        uuidColumn.setMaxWidth(0);
+
+        // Makes Prev. Status Column invisible
+        // Prev. Status to store prev stat :))
+        var prevStatusColumn = taskTable.getColumn("Prev. Status");
+        prevStatusColumn.setMinWidth(0);
+        prevStatusColumn.setMaxWidth(0);
+
         taskTable.putClientProperty("terminateEditOnFocusLost", true);
         taskTable.setRowHeight(24);
         taskTable.setFont(new Font("Montserrat", Font.PLAIN, 12));
@@ -149,15 +155,26 @@ public class MainSushi {
             int column = e.getColumn();
 
             if (column == 1) {
-                Boolean isCompleted = (Boolean) taskTable.getValueAt(row, column);
+                Boolean isCompleted = (Boolean) taskTable.getValueAt(row, 1);
                 String taskTitle = (String) tableModel.getValueAt(row, 0);
                 Task task = manager.getTaskById(taskTitle);
+                String status = (String) tableModel.getValueAt(row, 6);
+
+                // Strikethrough title
+                Font defaultFont = new Font("Montserrat", Font.PLAIN, 12);
+                AttributedString as = new AttributedString(taskTitle);
+                as.addAttribute(TextAttribute.FONT, defaultFont);
+                if (isCompleted) {
+                    as.addAttribute(TextAttribute.STRIKETHROUGH, TextAttribute.STRIKETHROUGH_ON, 0, taskTitle.length());
+                }
 
                 if (task != null) {
-                    task.setStatus(isCompleted ? "Completed" : "Pending");
+
+                    task.setStatus(isCompleted ? "Complete" : status);
                     task.setCompleted(isCompleted);
                     manager.saveTasks();
                     refreshTaskTable();
+
                 }
             }
 
@@ -401,6 +418,7 @@ public class MainSushi {
                     task.setTitle(titleField.getText());
                     task.setDescription(descriptionField.getText());
                     task.setPriority((String) priorityBox.getSelectedItem());
+                    task.setPreviousStatus(task.getStatus());
                     task.setStatus((String) statusBox.getSelectedItem());
                     task.setDueDate((Date) dueDateSpinner.getValue());
                     task.setCategory(categoryField.getText());
@@ -487,6 +505,11 @@ public class MainSushi {
         // return Integer.MAX_VALUE;
         // } // this is clever! good job!
         // }));
+        if (sortBy.equals("Status")) {
+            Collections.sort(tasks, comparator.reversed());
+        } else {
+            Collections.sort(tasks, comparator);
+        }
 
         for (Task task : manager.getAllTasks()) {
             var localDateTime = LocalDateTime.ofInstant(task.getDueDate().toInstant(), ZoneId.systemDefault());
@@ -499,19 +522,20 @@ public class MainSushi {
                     task.getDescription(),
                     formattedDate,
                     task.getPriority(),
+                    task.getPreviousStatus(),
                     task.getStatus(),
                     task.getCategory()
             });
         }
     }
-                   
+
     // main method
     public static void main(String[] args) throws UnsupportedLookAndFeelException {
         Font defaultFont = new Font("Montserrat", Font.PLAIN, 12);
         UIManager.setLookAndFeel(new FlatLightLaf());
         UIManager.put("OptionPane.messageFont", new Font("Montserrat", Font.BOLD, 12));
-        UIManager.put("OptionPane.buttonFont", defaultFont); 
-        UIManager.put("OptionPane.font", defaultFont); 
+        UIManager.put("OptionPane.buttonFont", defaultFont);
+        UIManager.put("OptionPane.font", defaultFont);
         UIManager.put("OptionPane.background", new Color(204, 218, 209));
         UIManager.put("OptionPane.messageForeground", new Color(33, 26, 30));
         UIManager.put("TextField.font", defaultFont);
