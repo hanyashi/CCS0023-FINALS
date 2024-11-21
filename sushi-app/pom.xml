@@ -29,6 +29,25 @@
   </dependencyManagement>
 
   <dependencies>
+
+    <dependency>
+      <groupId>org.swinglabs</groupId>
+      <artifactId>swingx</artifactId>
+      <version>1.6.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>io.github.dj-raven</groupId>
+      <artifactId>swing-datetime-picker</artifactId>
+      <version>1.4.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.fatboyindustrial.gson-javatime-serialisers</groupId>
+      <artifactId>gson-javatime-serialisers</artifactId>
+      <version>1.1.2</version>
+    </dependency>
+
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-api</artifactId>

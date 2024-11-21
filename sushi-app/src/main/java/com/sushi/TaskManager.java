@@ -4,6 +4,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -21,23 +22,29 @@ public final class TaskManager {
     }
 
     public void loadTasks() {
-        try (FileReader reader = new FileReader("tasks.json")) {
-            Gson gson = new Gson();
-            tasks = gson.fromJson(reader, new TypeToken<List<Task>>() {
-            }.getType());
-            if (tasks == null) {
-                tasks = new ArrayList<>();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+    try (FileReader reader = new FileReader("tasks.json")) {
+        Gson gson = new GsonBuilder()
+                .registerTypeAdapter(LocalDate.class, new LocalDateAdapter())
+                .create();
+        tasks = gson.fromJson(reader, new TypeToken<List<Task>>() {}.getType());
+        if (tasks == null) {
+            tasks = new ArrayList<>();
         }
+    } catch (IOException e) {
+        System.err.println("Could not load tasks.json: " + e.getMessage());
+        tasks = new ArrayList<>();
     }
+}
+
 
     public void saveTasks() {
         try (Writer writer = new FileWriter("tasks.json")) {
-            Gson gson;
-            gson = new GsonBuilder().setPrettyPrinting().create();
+            Gson gson = new GsonBuilder()
+            .registerTypeAdapter(LocalDate.class, new LocalDateAdapter())
+            .setPrettyPrinting()
+            .create();    
             gson.toJson(tasks, writer);
+            
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -54,13 +61,10 @@ public final class TaskManager {
             tasks.remove(taskToRemove);
             saveTasks();
         } else {
-            for (Task task : tasks) {
-                if (task.getId().equals(UUID.fromString(id))) {
-                    throw new TaskNFE("Task '" + task.getTitle() + "' not found.");
-                }
-            }
+            throw new TaskNFE("Task with ID '" + id + "' not found.");
         }
     }
+    
 
     public Task getTaskById(String id) {
         for (Task task : tasks) {

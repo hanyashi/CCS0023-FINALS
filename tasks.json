@@ -1,33 +1,23 @@
 [
   {
-    "id": "f911444b-92f4-47c3-8787-1149ea1d76d3",
+    "id": "ff15086c-e52e-4cf6-bb56-2b4bca125f66",
     "completed": false,
-    "title": "Task 4",
-    "description": "This is a task.",
-    "dueDate": "Nov 19, 2024, 6:05:58 PM",
+    "title": "",
+    "description": "",
+    "dueDate": "2024-11-20",
     "priority": "High",
     "status": "Pending",
-    "category": "TEST"
+    "category": "",
+    "previousStatus": "Pending"
   },
   {
-    "id": "eb7025f5-097b-4c94-8106-0017fb85da82",
     "completed": false,
-    "title": "Task 2",
-    "description": "This is a task.",
-    "dueDate": "Nov 19, 2024, 6:02:09 PM",
-    "priority": "Medium",
-    "status": "Complete",
-    "category": "TEST",
-    "previousStatus": "Complete"
-  },
-  {
-    "id": "afd4db5a-4ab1-4fb2-8333-43c35694e863",
-    "completed": false,
-    "title": "Task 3",
-    "description": "This is a task.",
-    "dueDate": "Nov 19, 2024, 6:03:46 PM",
-    "priority": "Low",
-    "status": "Overdue",
-    "category": "TEST"
+    "title": "",
+    "description": "",
+    "dueDate": "2024-11-15",
+    "priority": "High",
+    "status": "Pending",
+    "category": "",
+    "previousStatus": "Pending"
   }
 ]
