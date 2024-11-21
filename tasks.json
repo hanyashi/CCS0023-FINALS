@@ -1,16 +1,5 @@
 [
   {
-    "id": "e980dd8e-76f4-4d97-a3ba-b2c71662c81a",
-    "completed": false,
-    "title": "Task 1",
-    "description": "This is a task.",
-    "dueDate": "Nov 19, 2024, 6:01:37 PM",
-    "priority": "High",
-    "status": "Complete",
-    "category": "TEST",
-    "previousStatus": "Complete"
-  },
-  {
     "id": "f911444b-92f4-47c3-8787-1149ea1d76d3",
     "completed": true,
     "title": "Task 4",

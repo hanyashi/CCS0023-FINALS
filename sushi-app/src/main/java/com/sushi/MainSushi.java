@@ -256,7 +256,8 @@ public class MainSushi {
         title.setForeground(Color.decode("#FF8552"));
         title.setBorder(BorderFactory.createEmptyBorder(0, 30, 0, 0));
 
-        JButton profileButton = new JButton(logo);
+        ImageIcon userIcon = new ImageIcon(getClass().getClassLoader().getResource("assets/itamae.png"));
+        JButton profileButton = new JButton(userIcon);
         profileButton.addActionListener(e -> addTaskGUI());
         profileButton.setBackground(Color.decode("#211A1E"));
         profileButton.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 30));
@@ -276,37 +277,43 @@ public class MainSushi {
     }
 
     private JPanel createButtonPanel() {
-        ImageIcon logo = new ImageIcon(getClass().getClassLoader().getResource("assets/sushi-logo3.png"));
+        ImageIcon addIcon = new ImageIcon(getClass().getClassLoader().getResource("assets/temaki.png"));
+        ImageIcon filterIcon = new ImageIcon(getClass().getClassLoader().getResource("assets/sushi-filter.png"));
+        ImageIcon sortIcon = new ImageIcon(getClass().getClassLoader().getResource("assets/onigiri.png"));
+        
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         buttonPanel.setBackground(Color.decode("#CCDAD1"));
         buttonPanel.setBorder(new EmptyBorder(24, 36, 12, 36));
 
-        JButton addButton = new JButton("Add Task", logo);
+        JButton addButton = new JButton("Add Task", addIcon);
         addButton.addActionListener(e -> addTaskGUI());
         addButton.setFont(new Font("Montserrat", Font.BOLD, 14));
-        addButton.setPreferredSize(new Dimension(140, 40));
+        addButton.setPreferredSize(new Dimension(132, 40));
         addButton.setBackground(Color.decode("#211A1E"));
         addButton.setForeground(Color.decode("#CCDAD1"));
         addButton.setFocusable(false);
         addButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        addButton.setIconTextGap(10);
 
-        JButton filterButton = new JButton("Filter", logo);
+        JButton filterButton = new JButton("Filter", filterIcon);
         filterButton.addActionListener(e -> addTaskGUI());
         filterButton.setFont(new Font("Montserrat", Font.BOLD, 14));
-        filterButton.setPreferredSize(new Dimension(120, 40));
+        filterButton.setPreferredSize(new Dimension(105, 40));
         filterButton.setBackground(Color.decode("#211A1E"));
         filterButton.setForeground(Color.decode("#CCDAD1"));
         filterButton.setFocusable(false);
         filterButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        filterButton.setIconTextGap(10);
 
-        JButton sortButton = new JButton("Sort By", logo);
-        sortButton.setPreferredSize(new Dimension(125, 40));
+        JButton sortButton = new JButton("Sort", sortIcon);  
+        sortButton.setPreferredSize(new Dimension(95, 40));
         sortButton.setFont(new Font("Montserrat", Font.BOLD, 14));
         sortButton.setBackground(Color.decode("#211A1E"));
         sortButton.setForeground(Color.decode("#CCDAD1"));
         sortButton.setFocusable(false);
         sortButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        sortButton.setIconTextGap(10);
 
         JPopupMenu dropdownMenu = new JPopupMenu();
         dropdownMenu.setBackground(Color.decode("#211A1E"));
@@ -336,7 +343,7 @@ public class MainSushi {
         buttonPanel.add(addButton);
         buttonPanel.add(Box.createRigidArea(new Dimension(10, 0))); // 20px horizontal gap (it's invisible, tried using flowlayout hgap but it also added a gap before the add button)
         buttonPanel.add(filterButton);
-        buttonPanel.add(Box.createRigidArea(new Dimension(486, 0)));
+        buttonPanel.add(Box.createRigidArea(new Dimension(540, 0)));
         buttonPanel.add(sortButton, BorderLayout.EAST);
         return buttonPanel;
     }
@@ -385,7 +392,7 @@ public class MainSushi {
                 "Status:", statusBox,
                 "Due Date:", dueDateSpinner,
                 "Category:", categoryField
-        }, "Add Task", JOptionPane.OK_CANCEL_OPTION);
+        }, "Add Task", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null);
 
         if (result == JOptionPane.OK_OPTION) {
             String title = titleField.getText();
@@ -411,7 +418,7 @@ public class MainSushi {
         if (selectedRow != -1) {
             String title = (String) taskTable.getValueAt(selectedRow, 0);
             int confirm = JOptionPane.showConfirmDialog(mainFrame, "Are you sure you want to delete this task?",
-                    "Confirm Delete", JOptionPane.YES_NO_OPTION);
+                    "Confirm Delete", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
 
             if (confirm == JOptionPane.YES_OPTION) {
                 try {
@@ -458,7 +465,7 @@ public class MainSushi {
                         "Status:", statusBox,
                         "Due Date:", dueDateSpinner,
                         "Category:", categoryField
-                }, "Edit Task", JOptionPane.OK_CANCEL_OPTION);
+                }, "Edit Task", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null);
 
                 if (result == JOptionPane.OK_OPTION) {
                     task.setTitle(titleField.getText());
