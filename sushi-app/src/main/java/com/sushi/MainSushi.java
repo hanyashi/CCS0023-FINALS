@@ -9,6 +9,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Insets;
 import java.awt.font.TextAttribute;
 import java.text.AttributedString;
 import java.text.SimpleDateFormat;
@@ -138,6 +139,13 @@ public class MainSushi {
 
         taskTable = new JTable(tableModel);
 
+        // Centered Columns
+        taskTable.getColumnModel().getColumn(4).setCellRenderer(new CenteredTableCellRenderer());
+        taskTable.getColumnModel().getColumn(5).setCellRenderer(new CenteredTableCellRenderer());
+        taskTable.getColumnModel().getColumn(7).setCellRenderer(new CenteredTableCellRenderer());
+        taskTable.getColumnModel().getColumn(8).setCellRenderer(new CenteredTableCellRenderer());
+
+        // Checkbox Column
         var completedColumn = taskTable.getColumn(" ");
         completedColumn.setMaxWidth(24);
         completedColumn.setCellRenderer(new CheckBoxRenderer());
@@ -186,15 +194,14 @@ public class MainSushi {
                 }
 
                 if (task != null) {
-
                     task.setStatus(isCompleted ? "Complete" : status);
                     task.setCompleted(isCompleted);
                     manager.saveTasks();
+                    manager.updateTaskStatus(task.getId().toString(), isCompleted);
                     refreshTaskTable();
-
                 }
-            }
 
+            }
         });
     }
 
@@ -227,7 +234,6 @@ public class MainSushi {
                 Component comp = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                 ((JComponent) comp).setBorder(BorderFactory.createMatteBorder(1, 1,
                         (row == table.getRowCount() - 1 ? 1 : 0), 1, Color.decode("#211A1E")));
-
                 Color alternateColor = Color.decode("#B5CBBC");
                 Color defaultColor = Color.decode("#CCDAD1");
 
@@ -277,10 +283,10 @@ public class MainSushi {
         profileButton.setFocusable(false);
         profileButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
         profileButton.setUI(new MetalButtonUI() {
-        @Override
-        protected void paintButtonPressed(Graphics g, AbstractButton b) {
-        }
-    });
+            @Override
+            protected void paintButtonPressed(Graphics g, AbstractButton b) {
+            }
+        });
 
         titlePanel.add(title, BorderLayout.WEST);
         titlePanel.add(profileButton, BorderLayout.EAST);
@@ -291,7 +297,6 @@ public class MainSushi {
         ImageIcon addIcon = new ImageIcon(getClass().getClassLoader().getResource("assets/temaki.png"));
         ImageIcon filterIcon = new ImageIcon(getClass().getClassLoader().getResource("assets/sushi-filter.png"));
         ImageIcon sortIcon = new ImageIcon(getClass().getClassLoader().getResource("assets/onigiri.png"));
-        
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         buttonPanel.setBackground(Color.decode("#CCDAD1"));
@@ -317,7 +322,7 @@ public class MainSushi {
         filterButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
         filterButton.setIconTextGap(10);
 
-        JButton sortButton = new JButton("Sort", sortIcon);  
+        JButton sortButton = new JButton("Sort", sortIcon);
         sortButton.setPreferredSize(new Dimension(95, 40));
         sortButton.setFont(new Font("Montserrat", Font.BOLD, 14));
         sortButton.setBackground(Color.decode("#211A1E"));
@@ -328,7 +333,7 @@ public class MainSushi {
 
         JPopupMenu dropdownMenu = new JPopupMenu();
         dropdownMenu.setBackground(Color.decode("#211A1E"));
-    
+
         String[] options = { "Priority", "Name", "Due Date", "Status", "Category" };
         ButtonGroup buttonGroup = new ButtonGroup();
         Map<String, JCheckBoxMenuItem> menuItems = new HashMap<>();
@@ -344,15 +349,17 @@ public class MainSushi {
                 menuItem.setSelected(true);
             });
 
-        menuItems.put(option, menuItem);
-        buttonGroup.add(menuItem);
-        dropdownMenu.add(menuItem);
-    }
+            menuItems.put(option, menuItem);
+            buttonGroup.add(menuItem);
+            dropdownMenu.add(menuItem);
+        }
 
-    sortButton.addActionListener(e -> dropdownMenu.show(sortButton, 0, sortButton.getHeight()));
+        sortButton.addActionListener(e -> dropdownMenu.show(sortButton, 0, sortButton.getHeight()));
 
         buttonPanel.add(addButton);
-        buttonPanel.add(Box.createRigidArea(new Dimension(10, 0))); // 20px horizontal gap (it's invisible, tried using flowlayout hgap but it also added a gap before the add button)
+        buttonPanel.add(Box.createRigidArea(new Dimension(10, 0))); // 20px horizontal gap (it's invisible, tried using
+                                                                    // flowlayout hgap but it also added a gap before
+                                                                    // the add button)
         buttonPanel.add(filterButton);
         buttonPanel.add(Box.createRigidArea(new Dimension(537, 0)));
         buttonPanel.add(sortButton, BorderLayout.EAST);
@@ -611,15 +618,17 @@ public class MainSushi {
         }
 
         for (Task task : manager.getAllTasks()) {
+
             LocalDate localDate = task.getDueDate();
             LocalDateTime localDateTime = localDate.atTime(LocalTime.MIDNIGHT);
             DateTimeFormatter myFormatObj = DateTimeFormatter.ofPattern("MMM'.' dd yyyy hh:mm a");
             String formattedDate = localDateTime.format(myFormatObj);           
+
             tableModel.addRow(new Object[] {
                     task.getId().toString(),
                     task.getCompleted(), // checkbox column
-                    task.getTitle(),
-                    task.getDescription(),
+                    " " + task.getTitle(),
+                    " " + task.getDescription(),
                     formattedDate,
                     task.getPriority(),
                     task.getPreviousStatus(),

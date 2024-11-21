@@ -1,23 +1,35 @@
 [
   {
-    "id": "ff15086c-e52e-4cf6-bb56-2b4bca125f66",
+    "id": "22b055cc-c466-44bb-9525-82e84190f5c9",
     "completed": false,
-    "title": "",
-    "description": "",
-    "dueDate": "2024-11-20",
-    "priority": "High",
+    "title": "Sleep",
+    "description": "Tulog na boss",
+    "dueDate": "2039-12-31",
+    "priority": "Medium",
     "status": "Pending",
-    "category": "",
+    "category": "Hays",
     "previousStatus": "Pending"
   },
   {
-    "completed": false,
-    "title": "",
-    "description": "",
-    "dueDate": "2024-11-15",
+    "id": "5afacf7b-3aeb-4435-a2e2-64251d017b8c",
+    "completed": true,
+    "title": "Finish Java Finals Project",
+    "description": "Pakamatay nalang ako",
+    "dueDate": "2024-11-25",
     "priority": "High",
-    "status": "Pending",
-    "category": "",
+    "status": "Complete",
+    "category": "CCS0023L",
+    "previousStatus": "Pending"
+  },
+  {
+    "id": "e052717f-4d48-4d4b-b2b4-587462a44e9a",
+    "completed": true,
+    "title": "Wash Dishes",
+    "description": "Wash the dishes",
+    "dueDate": "2024-11-22",
+    "priority": "Low",
+    "status": "Complete",
+    "category": "House chores",
     "previousStatus": "Pending"
   }
 ]
