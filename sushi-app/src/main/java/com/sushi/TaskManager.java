@@ -71,6 +71,21 @@ public final class TaskManager {
         return null;
     }
 
+    public void updateTaskStatus(String id, boolean isCompleted) {
+        Task task = getTaskById(id);
+        if (task != null) {
+            if (isCompleted) {
+                tasks.remove(task);
+                tasks.add(task);
+            } else {
+                tasks.remove(task);
+                tasks.add(0, task);
+            }
+            saveTasks();
+        }
+
+    }
+
     public List<Task> getAllTasks() {
         return tasks;
     }
