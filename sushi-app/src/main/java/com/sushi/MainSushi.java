@@ -9,20 +9,14 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.Insets;
 import java.awt.font.TextAttribute;
 import java.text.AttributedString;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import static java.time.format.DateTimeFormatter.ofPattern;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,7 +30,6 @@ import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
@@ -44,11 +37,9 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
-import javax.swing.JSpinner;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
-import javax.swing.SpinnerDateModel;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -57,15 +48,12 @@ import javax.swing.plaf.metal.MetalButtonUI;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
-import org.jdesktop.swingx.JXDatePicker;
-
 import com.formdev.flatlaf.FlatLightLaf;
 import com.sushi.gui.CheckBoxEditor;
 import com.sushi.gui.CheckBoxRenderer;
 
 import raven.datetime.component.date.DateEvent;
 import raven.datetime.component.date.DatePicker;
-import raven.datetime.component.date.DateSelectionListener;
 
 // main class
 public class MainSushi {
@@ -104,7 +92,8 @@ public class MainSushi {
         setupTableBorders();
 
         mainFrame.add(mainPanel, BorderLayout.CENTER);
-
+    
+        
         mainFrame.add(createContainerPanel(), BorderLayout.NORTH);
         mainFrame.revalidate();
         mainFrame.repaint();
@@ -399,6 +388,7 @@ public class MainSushi {
         dueDatePicker = new DatePicker();
         dueDatePicker.setDateSelectionMode(DatePicker.DateSelectionMode.SINGLE_DATE_SELECTED);
         dueDatePicker.setColor(Color.decode("#211A1E"));
+        dueDatePicker.setFont(new Font("Montserrat", Font.PLAIN, 12));
         dueDatePicker.addDateSelectionListener((DateEvent dateEvent) -> {
             DateTimeFormatter df = DateTimeFormatter.ofPattern("MMM-dd-yyyy");
             LocalDate date = dueDatePicker.getSelectedDate();
@@ -497,18 +487,11 @@ public class MainSushi {
                 priorityBox.setSelectedItem(task.getPriority());
                 JComboBox<String> statusBox = new JComboBox<>(new String[] { "Pending", "Complete", "Overdue" });
                 statusBox.setSelectedItem(task.getStatus());
-                DatePicker dueDatePicker = new DatePicker();
-                dueDatePicker.setDateSelectionMode(DatePicker.DateSelectionMode.SINGLE_DATE_SELECTED);
-                dueDatePicker.addDateSelectionListener(new DateSelectionListener() {
-                    @Override
-                    public void dateSelected(DateEvent dateEvent) {
-                        DateTimeFormatter df=DateTimeFormatter.ofPattern("MMM-dd-yyyy HH:mm a");
-                        LocalDate date=dueDatePicker.getSelectedDate();
-                        if(dueDatePicker.isDateSelected()) {
-                            System.out.println(df.format(date));
-                        }
-                    }
-                });
+                JButton dateButton = new JButton("Select Date...");
+                dateButton.setPreferredSize(new Dimension(10, 20));
+                
+                dateButton.addActionListener(e -> dueDateGUI());
+                dateButton.setFont(new Font("Montserrat", Font.PLAIN, 12));
                 JTextField categoryField = new JTextField(task.getCategory(), 10);
 
                 int result = JOptionPane.showConfirmDialog(mainFrame, new Object[] {
@@ -516,7 +499,7 @@ public class MainSushi {
                         "Description:", descriptionField,
                         "Priority:", priorityBox,
                         "Status:", statusBox,
-                        "Due Date:", dueDatePicker,
+                        "Due Date:", dateButton,
                         "Category:", categoryField
                 }, "Edit Task", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null);
 
@@ -526,8 +509,14 @@ public class MainSushi {
                     task.setPriority((String) priorityBox.getSelectedItem());
                     task.setPreviousStatus(task.getStatus());
                     task.setStatus((String) statusBox.getSelectedItem());
-                    task.setDueDate((LocalDate) dueDatePicker.getSelectedDate());
+                    task.setDueDate(selectedDueDate);
                     task.setCategory(categoryField.getText());
+
+                    if (selectedDueDate == null) {
+                        JOptionPane.showMessageDialog(mainFrame, "Please select a due date.", "Error", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+
                     manager.saveTasks();
                     refreshTaskTable();
                     JOptionPane.showMessageDialog(mainFrame, "Task updated successfully.", "Edit",
@@ -621,7 +610,7 @@ public class MainSushi {
 
             LocalDate localDate = task.getDueDate();
             LocalDateTime localDateTime = localDate.atTime(LocalTime.MIDNIGHT);
-            DateTimeFormatter myFormatObj = DateTimeFormatter.ofPattern("MMM'.' dd yyyy hh:mm a");
+            DateTimeFormatter myFormatObj = DateTimeFormatter.ofPattern("MMM'.' dd',' yyyy");
             String formattedDate = localDateTime.format(myFormatObj);           
 
             tableModel.addRow(new Object[] {
