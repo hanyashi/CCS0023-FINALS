@@ -65,7 +65,6 @@ public class MainSushi {
 
     // constructor
     public MainSushi() {
-        Font defaultFont = new Font("Montserrat", Font.BOLD, 12);
         manager = new TaskManager();
         mainFrame = new JFrame("Sushi Beta 1.0");
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
