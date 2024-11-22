@@ -1,16 +1,5 @@
 [
   {
-    "id": "22b055cc-c466-44bb-9525-82e84190f5c9",
-    "completed": false,
-    "title": "Sleep",
-    "description": "Tulog na boss",
-    "dueDate": "2039-12-31",
-    "priority": "Medium",
-    "status": "Pending",
-    "category": "Hays",
-    "previousStatus": "Pending"
-  },
-  {
     "id": "5afacf7b-3aeb-4435-a2e2-64251d017b8c",
     "completed": true,
     "title": "Finish Java Finals Project",
@@ -19,6 +8,17 @@
     "priority": "High",
     "status": "Complete",
     "category": "CCS0023L",
+    "previousStatus": "Pending"
+  },
+  {
+    "id": "22b055cc-c466-44bb-9525-82e84190f5c9",
+    "completed": false,
+    "title": "Sleep",
+    "description": "Tulog na boss",
+    "dueDate": "2039-12-31",
+    "priority": "Medium",
+    "status": "Pending",
+    "category": "Hays",
     "previousStatus": "Pending"
   },
   {
