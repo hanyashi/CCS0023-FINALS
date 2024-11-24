@@ -34,7 +34,15 @@ public class CheckBoxRenderer extends JPanel implements TableCellRenderer {
 
         Color alternateColor = Color.decode("#B5CBBC");
         Color defaultColor = Color.decode("#CCDAD1");
-        setBackground(isSelected ? Color.decode("#99C567") : (row % 2 == 0 ? alternateColor : defaultColor));
+        Color checkedColor = Color.decode("#99C567");
+
+        Boolean isChecked = (Boolean) table.getValueAt(row, 1);
+
+        if (isChecked != null && isChecked) {
+            setBackground(checkedColor);
+        } else {
+            setBackground(isSelected ? Color.decode("#CCDAD1") : (row % 2 == 0 ? alternateColor : defaultColor));
+        }
 
         return this;
     }

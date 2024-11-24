@@ -10,11 +10,11 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.font.TextAttribute;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.text.AttributedString;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -23,6 +23,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
@@ -47,6 +48,8 @@ import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.plaf.metal.MetalButtonUI;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
@@ -123,6 +126,12 @@ public class MainSushi {
                     default:
                         return String.class;
                 }
+            }
+            
+            @Override
+            public void setValueAt(Object aValue, int row, int column) {
+                super.setValueAt(aValue, row, column);
+                fireTableRowsUpdated(row, row);
             }
 
             @Override
@@ -239,6 +248,13 @@ public class MainSushi {
             }
         });
 
+        int checkboxColumnIndex = 1;
+        for (int i = 0; i < taskTable.getColumnCount(); i++) {
+            if (i != checkboxColumnIndex) {
+                taskTable.getColumnModel().getColumn(i).setCellRenderer(new CustomRowRenderer(checkboxColumnIndex));
+            }
+        }
+
     }
 
     private JPanel createContainerPanel() {
@@ -264,7 +280,7 @@ public class MainSushi {
         title.setForeground(Color.decode("#FF8552"));
         title.setBorder(BorderFactory.createEmptyBorder(0, 30, 0, 0));
 
-        ImageIcon userIcon = new ImageIcon(getClass().getClassLoader().getResource("assets/cookbook.png"));
+        ImageIcon userIcon = new ImageIcon(getClass().getClassLoader().getResource("assets/itamae.png"));
         JButton profileButton = new JButton(userIcon);
         profileButton.addActionListener(e -> CheckUpdates());
         profileButton.setBackground(Color.decode("#211A1E"));
@@ -286,12 +302,27 @@ public class MainSushi {
 
     private JPanel createButtonPanel() {
         ImageIcon addIcon = new ImageIcon(getClass().getClassLoader().getResource("assets/temaki.png"));
-        ImageIcon filterIcon = new ImageIcon(getClass().getClassLoader().getResource("assets/sushi-filter.png"));
+        ImageIcon searchIcon = new ImageIcon(getClass().getClassLoader().getResource("assets/sushi-search.png"));
         ImageIcon sortIcon = new ImageIcon(getClass().getClassLoader().getResource("assets/onigiri.png"));
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         buttonPanel.setBackground(Color.decode("#CCDAD1"));
         buttonPanel.setBorder(new EmptyBorder(24, 36, 12, 36));
+
+        JButton searchIconPlaceholder = new JButton("", searchIcon);
+        searchIconPlaceholder.setPreferredSize(new Dimension(40, 38));
+        searchIconPlaceholder.setBackground(Color.decode("#211A1E"));
+        searchIconPlaceholder.setFocusable(false);
+        searchIconPlaceholder.setFocusPainted(false);
+        searchIconPlaceholder.setRolloverEnabled(false);
+        searchIconPlaceholder.setFocusable(false);
+        searchIconPlaceholder.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
+        searchIconPlaceholder.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+        searchIconPlaceholder.setUI(new MetalButtonUI() {
+            @Override
+            protected void paintButtonPressed(Graphics g, AbstractButton b) {
+            }
+        });
 
         JButton addButton = new JButton("Add Task", addIcon);
         addButton.addActionListener(e -> addTaskGUI());
@@ -303,15 +334,55 @@ public class MainSushi {
         addButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
         addButton.setIconTextGap(10);
 
-        JButton filterButton = new JButton("Filter", filterIcon);
-        filterButton.addActionListener(e -> addTaskGUI());
-        filterButton.setFont(new Font("Montserrat", Font.BOLD, 14));
-        filterButton.setPreferredSize(new Dimension(105, 40));
-        filterButton.setBackground(Color.decode("#211A1E"));
-        filterButton.setForeground(Color.decode("#CCDAD1"));
-        filterButton.setFocusable(false);
-        filterButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        filterButton.setIconTextGap(10);
+        JTextField searchField = new JTextField("Search tasks...");
+        searchField.setPreferredSize(new Dimension(115, 38));
+        searchField.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
+        searchField.addFocusListener(new FocusListener() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                if (searchField.getText().equals("Search tasks...")) {
+                    searchField.setText("");
+                    searchField.setFont(new Font("Montserrat", Font.PLAIN, 14));
+                    searchField.setForeground(new Color(0, 0, 0));
+                }
+            }
+        
+            @Override
+            public void focusLost(FocusEvent e) {
+                if (searchField.getText().equals("")) {
+                    searchField.setText("Search tasks...");
+                    searchField.setFont(new Font("Montserrat", Font.ITALIC, 14));
+                    searchField.setForeground(new Color(150, 150, 150));
+                }
+            }
+        });
+        searchField.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                filterTasks(searchField.getText());
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                filterTasks(searchField.getText());
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                filterTasks(searchField.getText());
+            }
+        });
+
+
+        JButton searchButton = new JButton("Search", searchIcon);
+        searchButton.addActionListener(e -> addTaskGUI());
+        searchButton.setFont(new Font("Montserrat", Font.BOLD, 14));
+        searchButton.setPreferredSize(new Dimension(115, 40));
+        searchButton.setBackground(Color.decode("#211A1E"));
+        searchButton.setForeground(Color.decode("#CCDAD1"));
+        searchButton.setFocusable(false);
+        searchButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        searchButton.setIconTextGap(10);
 
         JButton sortButton = new JButton("Sort", sortIcon);
         sortButton.setPreferredSize(new Dimension(95, 40));
@@ -347,12 +418,16 @@ public class MainSushi {
 
         sortButton.addActionListener(e -> dropdownMenu.show(sortButton, 0, sortButton.getHeight()));
 
+        JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        searchPanel.add(searchIconPlaceholder);
+        searchPanel.add(searchField);
+
         buttonPanel.add(addButton);
         buttonPanel.add(Box.createRigidArea(new Dimension(10, 0))); // 20px horizontal gap (it's invisible, tried using
                                                                     // flowlayout hgap but it also added a gap before
                                                                     // the add button)
-        buttonPanel.add(filterButton);
-        buttonPanel.add(Box.createRigidArea(new Dimension(537, 0)));
+        buttonPanel.add(searchPanel);
+        buttonPanel.add(Box.createRigidArea(new Dimension(487, 0)));
         buttonPanel.add(sortButton, BorderLayout.EAST);
         return buttonPanel;
     }
@@ -383,6 +458,68 @@ public class MainSushi {
     }
 
     // TASK MANAGEMENT METHODS
+    // search by id
+    private void filterTasks(String query) {
+    tableModel.setRowCount(0);
+
+    List<Task> tasks = manager.getAllTasks();
+
+    if (query.equals("Search tasks...") || query.isEmpty()) {
+        manager.getAllTasks();
+        for (Task task : tasks) {
+            LocalDate localDate = task.getDueDate();
+            DateTimeFormatter myFormatObj = DateTimeFormatter.ofPattern("MMM'.' dd',' yyyy");
+            String formattedDate = localDate.format(myFormatObj);
+            LocalTime localTime = task.getDueTime();
+            DateTimeFormatter myFormatObj1 = DateTimeFormatter.ofPattern("hh:mma");
+            String formattedTime = localTime.format(myFormatObj1);
+
+            tableModel.addRow(new Object[]{
+                    task.getId().toString(),
+                    task.getCompleted(),
+                    " " + task.getTitle(),
+                    " " + task.getDescription(),
+                    formattedDate,
+                    formattedTime,
+                    task.getPriority(),
+                    task.getPreviousStatus(),
+                    task.getStatus(),
+                    task.getCategory()
+                });
+            }
+    } else {
+        List<Task> filteredTasks = tasks.stream()
+            .filter(task -> task.getTitle().toLowerCase().contains(query.toLowerCase()) ||
+                           task.getDescription().toLowerCase().contains(query.toLowerCase()) ||
+                           task.getCategory().toLowerCase().contains(query.toLowerCase()))
+            .collect(Collectors.toList());
+
+        for (Task task : filteredTasks) {
+            LocalDate localDate = task.getDueDate();
+            DateTimeFormatter myFormatObj = DateTimeFormatter.ofPattern("MMM'.' dd',' yyyy");
+            String formattedDate = localDate.format(myFormatObj);
+            LocalTime localTime = task.getDueTime();
+            DateTimeFormatter myFormatObj1 = DateTimeFormatter.ofPattern("hh:mma");
+            String formattedTime = localTime.format(myFormatObj1);
+
+            tableModel.addRow(new Object[]{
+                    task.getId().toString(),
+                    task.getCompleted(),
+                    " " + task.getTitle(),
+                    " " + task.getDescription(),
+                    formattedDate,
+                    formattedTime,
+                    task.getPriority(),
+                    task.getPreviousStatus(),
+                    task.getStatus(),
+                    task.getCategory()
+                });
+            }
+    }
+
+    
+    }
+
     // due date method
     private DatePicker dueDatePicker;
     private LocalDate selectedDueDate = null;
@@ -672,18 +809,14 @@ public class MainSushi {
 
     // App Updates
     private void CheckUpdates() {
-        JOptionPane optionPane = new JOptionPane("Updates", JOptionPane.INFORMATION_MESSAGE);
-        JButton button = new JButton("Check for Updates");
-        button.addActionListener(event -> {
+        int confirm = JOptionPane.showConfirmDialog(mainFrame, "Visit Github Repository?", "Check for Updates", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE);
+        if (confirm == JOptionPane.YES_OPTION) {
             try {
-                Desktop.getDesktop().browse(new URI("https://github.com/hanyashi/CCS0023-FINALS")); // To be replaced
+                Desktop.getDesktop().browse(new URI("https://github.com/hanyashi/CCS0023-FINALS"));
             } catch (URISyntaxException | IOException ex) {
                 ex.printStackTrace();
             }
-        });
-        optionPane.add(button);
-        JOptionPane.showOptionDialog(null, optionPane, "Updates", JOptionPane.CANCEL_OPTION,
-                JOptionPane.INFORMATION_MESSAGE, null, null, null);
+        }
     }
 
     // main method
