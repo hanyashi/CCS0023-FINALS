@@ -5,6 +5,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -25,6 +26,7 @@ public final class TaskManager {
     try (FileReader reader = new FileReader("tasks.json")) {
         Gson gson = new GsonBuilder()
                 .registerTypeAdapter(LocalDate.class, new LocalDateAdapter())
+                .registerTypeAdapter(LocalTime.class, new LocalTimeAdapter())
                 .create();
         tasks = gson.fromJson(reader, new TypeToken<List<Task>>() {}.getType());
         if (tasks == null) {
@@ -41,6 +43,7 @@ public final class TaskManager {
         try (Writer writer = new FileWriter("tasks.json")) {
             Gson gson = new GsonBuilder()
             .registerTypeAdapter(LocalDate.class, new LocalDateAdapter())
+            .registerTypeAdapter(LocalTime.class, new LocalTimeAdapter())
             .setPrettyPrinting()
             .create();    
             gson.toJson(tasks, writer);

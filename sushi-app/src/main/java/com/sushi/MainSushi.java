@@ -12,7 +12,6 @@ import java.awt.Graphics;
 import java.awt.font.TextAttribute;
 import java.text.AttributedString;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
@@ -106,7 +105,7 @@ public class MainSushi {
     // table setup methods
     private void setupTable() {
         tableModel = new DefaultTableModel(
-                new String[] { "UUID", " ", "Title", "Description", "Due Date", "Priority", "Prev. Status", "Status",
+                new String[] { "UUID", " ", "Title", "Description", "Date Due", "Time Due", "Priority", "Prev. Status", "Status",
                         "Category" },
                 0) {
 
@@ -133,8 +132,10 @@ public class MainSushi {
         // Centered Columns
         taskTable.getColumnModel().getColumn(4).setCellRenderer(new CenteredTableCellRenderer());
         taskTable.getColumnModel().getColumn(5).setCellRenderer(new CenteredTableCellRenderer());
+        taskTable.getColumnModel().getColumn(6).setCellRenderer(new CenteredTableCellRenderer());
         taskTable.getColumnModel().getColumn(7).setCellRenderer(new CenteredTableCellRenderer());
         taskTable.getColumnModel().getColumn(8).setCellRenderer(new CenteredTableCellRenderer());
+        taskTable.getColumnModel().getColumn(9).setCellRenderer(new CenteredTableCellRenderer());
 
         // Checkbox Column
         var completedColumn = taskTable.getColumn(" ");
@@ -414,7 +415,7 @@ public class MainSushi {
         dueTimePicker.setColor(Color.decode("#211A1E"));
         dueTimePicker.setFont(new Font("Montserrat", Font.PLAIN, 12));
         dueTimePicker.addTimeSelectionListener((TimeEvent timeEvent) -> {
-            DateTimeFormatter df = DateTimeFormatter.ofPattern("HH:mma");
+            DateTimeFormatter df = DateTimeFormatter.ofPattern("hh:mma");
             LocalTime time = dueTimePicker.getSelectedTime();
             if (dueTimePicker.isTimeSelected()) {
                 selectedTime = dueTimePicker.getSelectedTime();
@@ -455,7 +456,7 @@ public class MainSushi {
                 "Description:", descriptionField,
                 "Priority:", priorityBox,
                 "Status:", statusBox,
-                "Due Date:", datePanel,
+                "Date & Time Due:", datePanel,
                 "Category:", categoryField
         }, "Add Task", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null);
 
@@ -466,12 +467,12 @@ public class MainSushi {
             String status = (String) statusBox.getSelectedItem();
             String category = categoryField.getText();
 
-            if (selectedDueDate == null) {
-                JOptionPane.showMessageDialog(mainFrame, "Please select a due date.", "Error", JOptionPane.ERROR_MESSAGE);
+            if (selectedDueDate == null || selectedTime == null) {
+                JOptionPane.showMessageDialog(mainFrame, "Please select a due date & time.", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
-            Task task = new Task(false, title, description, selectedDueDate, priority, status, category);
+            Task task = new Task(false, title, description, selectedDueDate, selectedTime, priority, status, category);
             manager.addTask(task);
             manager.saveTasks();
             refreshTaskTable();
@@ -525,15 +526,27 @@ public class MainSushi {
                 dateButton.setPreferredSize(new Dimension(10, 20));
                 
                 dateButton.addActionListener(e -> dueDateGUI());
+                dateButton.setPreferredSize(new Dimension(120, 20));
                 dateButton.setFont(new Font("Montserrat", Font.PLAIN, 12));
                 JTextField categoryField = new JTextField(task.getCategory(), 10);
+                
+                JButton timeButton = new JButton("Select Time...");
+                timeButton.addActionListener(e -> dueTimeGUI());
+                timeButton.setPreferredSize(new Dimension(120, 20));
+                timeButton.setFont(new Font("Montserrat", Font.PLAIN, 12));
+                
+                JPanel datePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+                datePanel.setBackground(Color.decode("#CCDAD1"));
+                datePanel.add(dateButton, FlowLayout.LEFT);
+                datePanel.add(Box.createRigidArea(new Dimension(5, 0)));
+                datePanel.add(timeButton);
 
                 int result = JOptionPane.showConfirmDialog(mainFrame, new Object[] {
                         "Title:", titleField,
                         "Description:", descriptionField,
                         "Priority:", priorityBox,
                         "Status:", statusBox,
-                        "Due Date:", dateButton,
+                        "Due Date:", datePanel,
                         "Category:", categoryField
                 }, "Edit Task", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null);
 
@@ -544,12 +557,8 @@ public class MainSushi {
                     task.setPreviousStatus(task.getStatus());
                     task.setStatus((String) statusBox.getSelectedItem());
                     task.setDueDate(selectedDueDate);
+                    task.setDueTime(selectedTime);
                     task.setCategory(categoryField.getText());
-
-                    if (selectedDueDate == null) {
-                        JOptionPane.showMessageDialog(mainFrame, "Please select a due date.", "Error", JOptionPane.ERROR_MESSAGE);
-                        return;
-                    }
 
                     manager.saveTasks();
                     refreshTaskTable();
@@ -631,9 +640,11 @@ public class MainSushi {
         for (Task task : manager.getAllTasks()) {
 
             LocalDate localDate = task.getDueDate();
-            LocalDateTime localDateTime = localDate.atTime(LocalTime.MIDNIGHT);
-            DateTimeFormatter myFormatObj = DateTimeFormatter.ofPattern("MMM'.' dd',' yyyy HH:mma");
-            String formattedDate = localDateTime.format(myFormatObj);           
+            DateTimeFormatter myFormatObj = DateTimeFormatter.ofPattern("MMM'.' dd',' yyyy");
+            String formattedDate = localDate.format(myFormatObj);
+            LocalTime localTime = task.getDueTime();
+            DateTimeFormatter myFormatObj1 = DateTimeFormatter.ofPattern("hh:mma");
+            String formattedTime = localTime.format(myFormatObj1);
 
             tableModel.addRow(new Object[] {
                     task.getId().toString(),
@@ -641,6 +652,7 @@ public class MainSushi {
                     " " + task.getTitle(),
                     " " + task.getDescription(),
                     formattedDate,
+                    formattedTime,
                     task.getPriority(),
                     task.getPreviousStatus(),
                     task.getStatus(),

@@ -1,6 +1,7 @@
 package com.sushi;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.UUID;
 
 public class Task {
@@ -9,6 +10,7 @@ public class Task {
     private String title;
     private String description;
     private LocalDate dueDate;
+    private LocalTime dueTime;
     private String priority;
     private String status;
     private String category;
@@ -17,13 +19,14 @@ public class Task {
     // TODO: Make unique identifier for Task
 
     // attributes
-    public Task(Boolean completed, String title, String description, LocalDate dueDate, String priority,
+    public Task(Boolean completed, String title, String description, LocalDate dueDate, LocalTime dueTime, String priority,
             String status,
             String category) {
         this.completed = completed;
         this.title = title;
         this.description = description;
         this.dueDate = dueDate;
+        this.dueTime = dueTime;
         this.priority = priority;
         this.status = status;
         this.previousStatus = status;
@@ -84,6 +87,14 @@ public class Task {
 
     public void setDueDate(LocalDate dueDate) {
         this.dueDate = dueDate;
+    }
+
+    public LocalTime getDueTime() {
+        return dueTime;
+    }
+
+    public void setDueTime(LocalTime dueTime) {
+        this.dueTime = dueTime;
     }
 
     public String getPriority() {

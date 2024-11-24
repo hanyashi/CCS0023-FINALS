@@ -1,35 +1,26 @@
 [
   {
-    "id": "5afacf7b-3aeb-4435-a2e2-64251d017b8c",
-    "completed": true,
-    "title": "Finish Java Finals Project",
-    "description": "Pakamatay nalang ako",
-    "dueDate": "2024-11-25",
-    "priority": "High",
-    "status": "Complete",
-    "category": "CCS0023L",
-    "previousStatus": "Pending"
-  },
-  {
-    "id": "22b055cc-c466-44bb-9525-82e84190f5c9",
+    "id": "826b9fa8-b0b4-4f61-9103-8733355b91bd",
     "completed": false,
-    "title": "Sleep",
-    "description": "Tulog na boss",
-    "dueDate": "2039-12-31",
-    "priority": "Medium",
-    "status": "Pending",
-    "category": "Hays",
-    "previousStatus": "Pending"
+    "title": "KILL TORU",
+    "description": "Stab him with a knife",
+    "dueDate": "2024-11-24",
+    "dueTime": "23:59:00",
+    "priority": "Low",
+    "status": "Low",
+    "category": "MURDER",
+    "previousStatus": "High"
   },
   {
-    "id": "e052717f-4d48-4d4b-b2b4-587462a44e9a",
-    "completed": true,
-    "title": "Wash Dishes",
-    "description": "Wash the dishes",
-    "dueDate": "2024-11-22",
-    "priority": "Low",
-    "status": "Complete",
-    "category": "House chores",
+    "id": "b815a0de-7b6d-439b-a87f-d6cb8dc370ae",
+    "completed": false,
+    "title": "",
+    "description": "",
+    "dueDate": "2024-11-25",
+    "dueTime": "23:59:00",
+    "priority": "High",
+    "status": "High",
+    "category": "",
     "previousStatus": "Pending"
   }
 ]
