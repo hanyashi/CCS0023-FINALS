@@ -1,26 +1,38 @@
 [
   {
-    "id": "826b9fa8-b0b4-4f61-9103-8733355b91bd",
+    "id": "1b451fef-5a42-41ff-a5af-b347867c7976",
     "completed": false,
-    "title": "KILL TORU",
-    "description": "Stab him with a knife",
-    "dueDate": "2024-11-24",
-    "dueTime": "23:59:00",
-    "priority": "Low",
-    "status": "Low",
-    "category": "MURDER",
-    "previousStatus": "High"
-  },
-  {
-    "id": "b815a0de-7b6d-439b-a87f-d6cb8dc370ae",
-    "completed": false,
-    "title": "",
-    "description": "",
+    "title": "Sample Task 1",
+    "description": "This is a task!",
     "dueDate": "2024-11-25",
     "dueTime": "23:59:00",
     "priority": "High",
-    "status": "High",
-    "category": "",
+    "status": "Pending",
+    "category": "CCS0023L",
     "previousStatus": "Pending"
+  },
+  {
+    "id": "bff03b20-6d09-4c42-bb7b-5f9b8bca4c43",
+    "completed": false,
+    "title": "Sample Task 2",
+    "description": "This is also a task!",
+    "dueDate": "2024-11-19",
+    "dueTime": "09:30:00",
+    "priority": "Medium",
+    "status": "Complete",
+    "category": "GED0021",
+    "previousStatus": "Complete"
+  },
+  {
+    "id": "fcb05a6b-b336-48bb-8a6b-94e533f43d2e",
+    "completed": false,
+    "title": "Sample Task 3",
+    "description": "Obviously, also a task.",
+    "dueDate": "2030-09-11",
+    "dueTime": "07:00:00",
+    "priority": "Low",
+    "status": "Overdue",
+    "category": "IT0017",
+    "previousStatus": "Overdue"
   }
 ]

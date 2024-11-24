@@ -154,6 +154,9 @@ public class MainSushi {
         prevStatusColumn.setMinWidth(0);
         prevStatusColumn.setMaxWidth(0);
 
+        var descriptionColumn = taskTable.getColumn("Description");
+        descriptionColumn.setMinWidth(125);
+
         taskTable.putClientProperty("terminateEditOnFocusLost", true);
         taskTable.setRowHeight(24);
         taskTable.setFont(new Font("Montserrat", Font.PLAIN, 12));
