@@ -93,8 +93,7 @@ public class MainSushi {
         setupTableBorders();
 
         mainFrame.add(mainPanel, BorderLayout.CENTER);
-    
-        
+
         mainFrame.add(createContainerPanel(), BorderLayout.NORTH);
         mainFrame.revalidate();
         mainFrame.repaint();
@@ -105,7 +104,8 @@ public class MainSushi {
     // table setup methods
     private void setupTable() {
         tableModel = new DefaultTableModel(
-                new String[] { "UUID", " ", "Title", "Description", "Date Due", "Time Due", "Priority", "Prev. Status", "Status",
+                new String[] { "UUID", " ", "Title", "Description", "Date Due", "Time Due", "Priority", "Prev. Status",
+                        "Status",
                         "Category" },
                 0) {
 
@@ -178,15 +178,7 @@ public class MainSushi {
                 Boolean isCompleted = (Boolean) taskTable.getValueAt(row, 1);
                 String taskTitle = (String) tableModel.getValueAt(row, 0);
                 Task task = manager.getTaskById(taskTitle);
-                String status = (String) tableModel.getValueAt(row, 6);
-
-                // Strikethrough title
-                Font defaultFont = new Font("Montserrat", Font.PLAIN, 12);
-                AttributedString as = new AttributedString(taskTitle);
-                as.addAttribute(TextAttribute.FONT, defaultFont);
-                if (isCompleted) {
-                    as.addAttribute(TextAttribute.STRIKETHROUGH, TextAttribute.STRIKETHROUGH_ON, 0, taskTitle.length());
-                }
+                String status = (String) tableModel.getValueAt(row, 7);
 
                 if (task != null) {
                     task.setStatus(isCompleted ? "Complete" : status);
@@ -392,6 +384,7 @@ public class MainSushi {
     private LocalDate selectedDueDate = null;
     private TimePicker dueTimePicker;
     private LocalTime selectedTime = null;
+
     private void dueDateGUI() {
         dueDatePicker = new DatePicker();
         dueDatePicker.setDateSelectionMode(DatePicker.DateSelectionMode.SINGLE_DATE_SELECTED);
@@ -408,8 +401,9 @@ public class MainSushi {
             }
         });
 
-        JOptionPane.showMessageDialog(mainFrame, dueDatePicker, "Select Due Date", JOptionPane.PLAIN_MESSAGE);  
+        JOptionPane.showMessageDialog(mainFrame, dueDatePicker, "Select Due Date", JOptionPane.PLAIN_MESSAGE);
     }
+
     // time picker method
     private void dueTimeGUI() {
         dueTimePicker = new TimePicker();
@@ -425,7 +419,7 @@ public class MainSushi {
                 System.out.println("Selected Time: " + df.format(time));
             }
         });
-        
+
         JOptionPane.showMessageDialog(mainFrame, dueTimePicker, "Select Due Time", JOptionPane.PLAIN_MESSAGE);
     }
 
@@ -438,7 +432,7 @@ public class MainSushi {
 
         JButton dateButton = new JButton("Select Date...");
         dateButton.setPreferredSize(new Dimension(120, 20));
-        
+
         dateButton.addActionListener(e -> dueDateGUI());
         dateButton.setFont(new Font("Montserrat", Font.PLAIN, 12));
 
@@ -446,7 +440,7 @@ public class MainSushi {
         timeButton.addActionListener(e -> dueTimeGUI());
         timeButton.setPreferredSize(new Dimension(120, 20));
         timeButton.setFont(new Font("Montserrat", Font.PLAIN, 12));
-        
+
         JPanel datePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         datePanel.setBackground(Color.decode("#CCDAD1"));
         datePanel.add(dateButton, FlowLayout.LEFT);
@@ -471,7 +465,8 @@ public class MainSushi {
             String category = categoryField.getText();
 
             if (selectedDueDate == null || selectedTime == null) {
-                JOptionPane.showMessageDialog(mainFrame, "Please select a due date & time.", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(mainFrame, "Please select a due date & time.", "Error",
+                        JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
@@ -527,17 +522,17 @@ public class MainSushi {
                 statusBox.setSelectedItem(task.getStatus());
                 JButton dateButton = new JButton("Select Date...");
                 dateButton.setPreferredSize(new Dimension(10, 20));
-                
+
                 dateButton.addActionListener(e -> dueDateGUI());
                 dateButton.setPreferredSize(new Dimension(120, 20));
                 dateButton.setFont(new Font("Montserrat", Font.PLAIN, 12));
                 JTextField categoryField = new JTextField(task.getCategory(), 10);
-                
+
                 JButton timeButton = new JButton("Select Time...");
                 timeButton.addActionListener(e -> dueTimeGUI());
                 timeButton.setPreferredSize(new Dimension(120, 20));
                 timeButton.setFont(new Font("Montserrat", Font.PLAIN, 12));
-                
+
                 JPanel datePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
                 datePanel.setBackground(Color.decode("#CCDAD1"));
                 datePanel.add(dateButton, FlowLayout.LEFT);
