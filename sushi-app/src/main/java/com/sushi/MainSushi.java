@@ -5,11 +5,15 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.font.TextAttribute;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.text.AttributedString;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -260,9 +264,9 @@ public class MainSushi {
         title.setForeground(Color.decode("#FF8552"));
         title.setBorder(BorderFactory.createEmptyBorder(0, 30, 0, 0));
 
-        ImageIcon userIcon = new ImageIcon(getClass().getClassLoader().getResource("assets/itamae.png"));
+        ImageIcon userIcon = new ImageIcon(getClass().getClassLoader().getResource("assets/cookbook.png"));
         JButton profileButton = new JButton(userIcon);
-        profileButton.addActionListener(e -> addTaskGUI());
+        profileButton.addActionListener(e -> CheckUpdates());
         profileButton.setBackground(Color.decode("#211A1E"));
         profileButton.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 30));
         profileButton.setFocusPainted(false);
@@ -464,6 +468,13 @@ public class MainSushi {
             String status = (String) statusBox.getSelectedItem();
             String category = categoryField.getText();
 
+            assert !title.isEmpty();
+            if (title.isEmpty()) {
+                JOptionPane.showMessageDialog(mainFrame, "Task title cannot be empty.", "Error",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
             if (selectedDueDate == null || selectedTime == null) {
                 JOptionPane.showMessageDialog(mainFrame, "Please select a due date & time.", "Error",
                         JOptionPane.ERROR_MESSAGE);
@@ -657,6 +668,22 @@ public class MainSushi {
                     task.getCategory()
             });
         }
+    }
+
+    // App Updates
+    private void CheckUpdates() {
+        JOptionPane optionPane = new JOptionPane("Updates", JOptionPane.INFORMATION_MESSAGE);
+        JButton button = new JButton("Check for Updates");
+        button.addActionListener(event -> {
+            try {
+                Desktop.getDesktop().browse(new URI("https://github.com/hanyashi/CCS0023-FINALS")); // To be replaced
+            } catch (URISyntaxException | IOException ex) {
+                ex.printStackTrace();
+            }
+        });
+        optionPane.add(button);
+        JOptionPane.showOptionDialog(null, optionPane, "Updates", JOptionPane.CANCEL_OPTION,
+                JOptionPane.INFORMATION_MESSAGE, null, null, null);
     }
 
     // main method

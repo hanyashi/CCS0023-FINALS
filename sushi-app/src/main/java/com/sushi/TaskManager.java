@@ -23,37 +23,38 @@ public final class TaskManager {
     }
 
     public void loadTasks() {
-    try (FileReader reader = new FileReader("tasks.json")) {
-        Gson gson = new GsonBuilder()
-                .registerTypeAdapter(LocalDate.class, new LocalDateAdapter())
-                .registerTypeAdapter(LocalTime.class, new LocalTimeAdapter())
-                .create();
-        tasks = gson.fromJson(reader, new TypeToken<List<Task>>() {}.getType());
-        if (tasks == null) {
+        try (FileReader reader = new FileReader("tasks.json")) {
+            Gson gson = new GsonBuilder()
+                    .registerTypeAdapter(LocalDate.class, new LocalDateAdapter())
+                    .registerTypeAdapter(LocalTime.class, new LocalTimeAdapter())
+                    .create();
+            tasks = gson.fromJson(reader, new TypeToken<List<Task>>() {
+            }.getType());
+            if (tasks == null) {
+                tasks = new ArrayList<>();
+            }
+        } catch (IOException e) {
+            System.err.println("Could not load tasks.json: " + e.getMessage());
             tasks = new ArrayList<>();
         }
-    } catch (IOException e) {
-        System.err.println("Could not load tasks.json: " + e.getMessage());
-        tasks = new ArrayList<>();
     }
-}
-
 
     public void saveTasks() {
         try (Writer writer = new FileWriter("tasks.json")) {
             Gson gson = new GsonBuilder()
-            .registerTypeAdapter(LocalDate.class, new LocalDateAdapter())
-            .registerTypeAdapter(LocalTime.class, new LocalTimeAdapter())
-            .setPrettyPrinting()
-            .create();    
+                    .registerTypeAdapter(LocalDate.class, new LocalDateAdapter())
+                    .registerTypeAdapter(LocalTime.class, new LocalTimeAdapter())
+                    .setPrettyPrinting()
+                    .create();
             gson.toJson(tasks, writer);
-            
+
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     public void addTask(Task task) {
+        assert task != null : "Cannot add null task";
         tasks.add(task);
         saveTasks();
     }
@@ -67,7 +68,6 @@ public final class TaskManager {
             throw new TaskNFE("Task with ID '" + id + "' not found.");
         }
     }
-    
 
     public Task getTaskById(String id) {
         for (Task task : tasks) {
