@@ -1,5 +1,17 @@
 [
   {
+    "id": "a3a854c1-8df1-435b-9e36-9ca507721629",
+    "completed": false,
+    "title": "P.T. #2",
+    "description": "Short Vlog",
+    "dueDate": "2024-11-26",
+    "dueTime": "23:59:00",
+    "priority": "Medium",
+    "status": "Pending",
+    "category": "GED0021",
+    "previousStatus": "Pending"
+  },
+  {
     "id": "9efe8066-e62c-41a5-a89c-4103f01df754",
     "completed": false,
     "title": "Final Project",
@@ -33,18 +45,6 @@
     "priority": "High",
     "status": "Pending",
     "category": "IT0119L",
-    "previousStatus": "Pending"
-  },
-  {
-    "id": "a3a854c1-8df1-435b-9e36-9ca507721629",
-    "completed": false,
-    "title": "P.T. #2",
-    "description": "Short Vlog",
-    "dueDate": "2024-11-26",
-    "dueTime": "23:59:00",
-    "priority": "Medium",
-    "status": "Pending",
-    "category": "GED0021",
     "previousStatus": "Pending"
   },
   {

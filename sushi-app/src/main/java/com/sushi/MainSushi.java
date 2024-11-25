@@ -487,6 +487,19 @@ public class MainSushi {
                     task.getCategory()
                 });
             }
+            taskTable.getColumnModel().getColumn(4).setCellRenderer(new CenteredTableCellRenderer());
+            taskTable.getColumnModel().getColumn(5).setCellRenderer(new CenteredTableCellRenderer());
+            taskTable.getColumnModel().getColumn(6).setCellRenderer(new CenteredTableCellRenderer());
+            taskTable.getColumnModel().getColumn(7).setCellRenderer(new CenteredTableCellRenderer());
+            taskTable.getColumnModel().getColumn(8).setCellRenderer(new CenteredTableCellRenderer());
+            taskTable.getColumnModel().getColumn(9).setCellRenderer(new CenteredTableCellRenderer());
+            
+            int checkboxColumnIndex = 1;
+            for (int i = 0; i < taskTable.getColumnCount(); i++) {
+                if (i != checkboxColumnIndex) {
+                    taskTable.getColumnModel().getColumn(i).setCellRenderer(new CustomRowRenderer(checkboxColumnIndex));
+                }
+            }
     } else {
         List<Task> filteredTasks = tasks.stream()
             .filter(task -> task.getTitle().toLowerCase().contains(query.toLowerCase()) ||
@@ -514,6 +527,19 @@ public class MainSushi {
                     task.getStatus(),
                     task.getCategory()
                 });
+            }
+            
+            taskTable.getColumnModel().getColumn(4).setCellRenderer(new CenteredTableCellRenderer());
+            taskTable.getColumnModel().getColumn(5).setCellRenderer(new CenteredTableCellRenderer());
+            taskTable.getColumnModel().getColumn(6).setCellRenderer(new CenteredTableCellRenderer());
+            taskTable.getColumnModel().getColumn(7).setCellRenderer(new CenteredTableCellRenderer());
+            taskTable.getColumnModel().getColumn(8).setCellRenderer(new CenteredTableCellRenderer());
+            taskTable.getColumnModel().getColumn(9).setCellRenderer(new CenteredTableCellRenderer());
+            int checkboxColumnIndex = 1;
+            for (int i = 0; i < taskTable.getColumnCount(); i++) {
+                if (i != checkboxColumnIndex) {
+                    taskTable.getColumnModel().getColumn(i).setCellRenderer(new CustomRowRenderer(checkboxColumnIndex));
+                }
             }
     }
 
