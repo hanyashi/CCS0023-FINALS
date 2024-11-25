@@ -5,6 +5,7 @@ import java.awt.Component;
 
 import javax.swing.BorderFactory;
 import javax.swing.JTable;
+import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 
 public class CustomRowRenderer extends DefaultTableCellRenderer {
@@ -35,6 +36,11 @@ public class CustomRowRenderer extends DefaultTableCellRenderer {
             cell.setBackground(isSelected ? Color.decode("#FF8552") : (row % 2 == 0 ? alternateColor : defaultColor));
             cell.setForeground(isSelected ? Color.decode("#211A1E") : Color.decode("#211A1E"));
         }
+        
+        if (column == 4 || column == 5 || column == 6 || column == 8 || column == 9) {
+            setHorizontalAlignment(SwingConstants.CENTER);
+        } 
+        // 4 5 6 8 9
 
         return cell;
     }

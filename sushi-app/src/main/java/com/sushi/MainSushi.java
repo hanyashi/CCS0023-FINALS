@@ -142,14 +142,6 @@ public class MainSushi {
 
         taskTable = new JTable(tableModel);
 
-        // Centered Columns
-        taskTable.getColumnModel().getColumn(4).setCellRenderer(new CenteredTableCellRenderer());
-        taskTable.getColumnModel().getColumn(5).setCellRenderer(new CenteredTableCellRenderer());
-        taskTable.getColumnModel().getColumn(6).setCellRenderer(new CenteredTableCellRenderer());
-        taskTable.getColumnModel().getColumn(7).setCellRenderer(new CenteredTableCellRenderer());
-        taskTable.getColumnModel().getColumn(8).setCellRenderer(new CenteredTableCellRenderer());
-        taskTable.getColumnModel().getColumn(9).setCellRenderer(new CenteredTableCellRenderer());
-
         // Checkbox Column
         var completedColumn = taskTable.getColumn(" ");
         completedColumn.setMaxWidth(24);
@@ -487,12 +479,6 @@ public class MainSushi {
                     task.getCategory()
                 });
             }
-            taskTable.getColumnModel().getColumn(4).setCellRenderer(new CenteredTableCellRenderer());
-            taskTable.getColumnModel().getColumn(5).setCellRenderer(new CenteredTableCellRenderer());
-            taskTable.getColumnModel().getColumn(6).setCellRenderer(new CenteredTableCellRenderer());
-            taskTable.getColumnModel().getColumn(7).setCellRenderer(new CenteredTableCellRenderer());
-            taskTable.getColumnModel().getColumn(8).setCellRenderer(new CenteredTableCellRenderer());
-            taskTable.getColumnModel().getColumn(9).setCellRenderer(new CenteredTableCellRenderer());
             
             int checkboxColumnIndex = 1;
             for (int i = 0; i < taskTable.getColumnCount(); i++) {
@@ -529,12 +515,6 @@ public class MainSushi {
                 });
             }
             
-            taskTable.getColumnModel().getColumn(4).setCellRenderer(new CenteredTableCellRenderer());
-            taskTable.getColumnModel().getColumn(5).setCellRenderer(new CenteredTableCellRenderer());
-            taskTable.getColumnModel().getColumn(6).setCellRenderer(new CenteredTableCellRenderer());
-            taskTable.getColumnModel().getColumn(7).setCellRenderer(new CenteredTableCellRenderer());
-            taskTable.getColumnModel().getColumn(8).setCellRenderer(new CenteredTableCellRenderer());
-            taskTable.getColumnModel().getColumn(9).setCellRenderer(new CenteredTableCellRenderer());
             int checkboxColumnIndex = 1;
             for (int i = 0; i < taskTable.getColumnCount(); i++) {
                 if (i != checkboxColumnIndex) {
@@ -543,6 +523,7 @@ public class MainSushi {
             }
     }
 
+    
     
     }
 
