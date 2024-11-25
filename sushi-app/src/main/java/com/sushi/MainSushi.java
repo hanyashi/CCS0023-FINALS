@@ -280,23 +280,23 @@ public class MainSushi {
         title.setForeground(Color.decode("#FF8552"));
         title.setBorder(BorderFactory.createEmptyBorder(0, 30, 0, 0));
 
-        ImageIcon userIcon = new ImageIcon(getClass().getClassLoader().getResource("assets/itamae.png"));
-        JButton profileButton = new JButton(userIcon);
-        profileButton.addActionListener(e -> CheckUpdates());
-        profileButton.setBackground(Color.decode("#211A1E"));
-        profileButton.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 30));
-        profileButton.setFocusPainted(false);
-        profileButton.setRolloverEnabled(false);
-        profileButton.setFocusable(false);
-        profileButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        profileButton.setUI(new MetalButtonUI() {
+        ImageIcon settingsIcon = new ImageIcon(getClass().getClassLoader().getResource("assets/sushi-settings-resized.png"));
+        JButton settingsButton = new JButton(settingsIcon);
+        settingsButton.addActionListener(e -> CheckUpdates());
+        settingsButton.setBackground(Color.decode("#211A1E"));
+        settingsButton.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 30));
+        settingsButton.setFocusPainted(false);
+        settingsButton.setRolloverEnabled(false);
+        settingsButton.setFocusable(false);
+        settingsButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        settingsButton.setUI(new MetalButtonUI() {
             @Override
             protected void paintButtonPressed(Graphics g, AbstractButton b) {
             }
         });
 
         titlePanel.add(title, BorderLayout.WEST);
-        titlePanel.add(profileButton, BorderLayout.EAST);
+        titlePanel.add(settingsButton, BorderLayout.EAST);
         return titlePanel;
     }
 

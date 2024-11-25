@@ -49,13 +49,13 @@
   },
   {
     "id": "58fe8bc4-5c1d-4564-ba7d-3cae95ef8cb5",
-    "completed": false,
+    "completed": true,
     "title": "Final Project",
     "description": "\"How To Appreciate Life\" Vlog",
     "dueDate": "2024-11-29",
     "dueTime": "23:59:00",
     "priority": "Low",
-    "status": "Pending",
+    "status": "Complete",
     "category": "GED0019",
     "previousStatus": "Pending"
   }
