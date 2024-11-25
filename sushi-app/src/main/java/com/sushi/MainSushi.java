@@ -490,7 +490,9 @@ public class MainSushi {
         List<Task> filteredTasks = tasks.stream()
             .filter(task -> task.getTitle().toLowerCase().contains(query.toLowerCase()) ||
                            task.getDescription().toLowerCase().contains(query.toLowerCase()) ||
-                           task.getCategory().toLowerCase().contains(query.toLowerCase()))
+                           task.getCategory().toLowerCase().contains(query.toLowerCase()) ||
+                           task.getStatus().toLowerCase().contains(query.toLowerCase()) ||
+                           task.getPriority().toLowerCase().contains(query.toLowerCase()))
             .collect(Collectors.toList());
 
         for (Task task : filteredTasks) {
@@ -765,12 +767,13 @@ public class MainSushi {
                             return 0;
                         case "Pending":
                             return 1;
-                        case "Completed":
+                        case "Complete":
                             return 2;
                         default:
                             return Integer.MAX_VALUE;
                     } // thx cess
                 });
+                
                 break;
             case "Category":
                 comparator = Comparator.comparing(Task::getCategory);
@@ -781,12 +784,6 @@ public class MainSushi {
         }
 
         if (comparator != null) {
-            Collections.sort(tasks, comparator);
-        }
-
-        if (sortBy.equals("Status")) {
-            Collections.sort(tasks, comparator.reversed());
-        } else {
             Collections.sort(tasks, comparator);
         }
 
